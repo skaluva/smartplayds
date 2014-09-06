@@ -1,0 +1,19 @@
+{
+  "name": "smartplayds",
+  "version": "1.0.0",
+  "description": "smartplayds application phase#1",
+  "main": "angular.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skaluva/smartplayds.git"
+  },
+  "author": "kaluva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skaluva/smartplayds/issues"
+  },
+  "homepage": "https://github.com/skaluva/smartplayds"
+}

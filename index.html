@@ -51,14 +51,13 @@
 		}
 
 		function signin(mode, authorizeCallback) {
-		  gapi.auth.authorize({client_id: "444838946066-p732st7ijf78bus0enh219ajt907n042.apps.googleusercontent.com",
-			scope: "userinfo.email", immediate: mode},
+		  gapi.auth.authorize({client_id: "444838946066-s4p6e92h5pvnifbt4q1itahv0c65fjeu.apps.googleusercontent.com",
+			scope: "https://www.googleapis.com/auth/userinfo.email", immediate: mode},
 			authorizeCallback);
 		}
 
 		function userAuthed() {
-		  var request =
-			  gapi.client.oauth2.userinfo.get().execute(function(resp) {
+		  var request =	  gapi.client.oauth2.userinfo.get().execute(function(resp) {
 			alert(resp.code);
 			if (!resp.code) {
 			  // User is signed in, call my Endpoint
