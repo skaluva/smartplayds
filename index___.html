@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html data-ng-app="smartplayds">
+	<head>
+		<link rel="stylesheet" type="text/css" href="bootstrap.css"/>
+	</head>
+	<body>
+		<p>
+			{{"hello" + " you"}}
+		</p>
+		    <p>1 + 2 = {{ 1 + 2 }}</p>
+		
+		
+		<div data-ng-controller="loginController">
+		<p>Login EmailID: <input type="text" data-ng-model="loginId"></p>
+		<p data-ng-bind="loginId"></p>
+		
+		<a href="#" onclick="auth();" id="signinButton">Sign in!</a>
+		
+		<button onclick="auth();return false;">Sign INNNNNNNNNNNNN!</button>
+
+	</div>
+	<script type="text/javascript" src="angular.js"></script>
+	<script type="text/javascript" src="app.js"></script>
+	<script src="https://apis.google.com/js/client.js?onload=init"></script>
+	<script>
+		function loginController($scope,$http){
+			/*$scope.loginId="abc@gmail.com";
+			 $http.get("https://rvacore-test.appspot.com/_ah/api/core/v0/user?username=sreenivasulu.kaluva@gmail.com")
+			.success(function(response) {$scope.names = response;});
+			
+			*/
+			/*var ROOT = "https://rvacore-test.appspot.appspot.com/_ah/api";
+			gapi.client.load('core.user.get', 'v0', function() {
+			  doSomethingAfterLoading();
+			}, ROOT);*/
+		}
+		
+		
+		function dddd() {
+		  var apisToLoad;
+		  var loadCallback = function() {
+			if (--apisToLoad == 0) {
+			  signin(true, userAuthed);
+			}
+		  };
+
+		  apisToLoad = 2; // must match number of calls to gapi.client.load()
+		  apiRoot = "https://rvacore-test.appspot.appspot.com/_ah/api";
+		  gapi.client.load('core.user.get', 'v0', loadCallback, apiRoot);
+		  gapi.client.load('oauth2', 'v2', loadCallback);
+		}
+		
+		function initRV() {
+		  var loadCallback = function(resp) {
+			
+			alert("received...."+resp);  
+			
+			signin(true, userAuthed);
+		  };
+
+		  apiRoot = "https://rvacore-test.appspot.appspot.com/_ah/api";
+		 //gapi.client.load('core.user.get', 'v0', loadCallback, apiRoot);
+		  
+		  gapi.client.load('oauth2', 'v2', loadCallback);
+		  
+		}
+
+		//444838946066-p732st7ijf78bus0enh219ajt907n042.apps.googleusercontent.com (old)
+		//444838946066-s4p6e92h5pvnifbt4q1itahv0c65fjeu.apps.googleusercontent.com
+		function signin(mode, authorizeCallback) {
+		  gapi.auth.authorize({client_id: "444838946066-s4p6e92h5pvnifbt4q1itahv0c65fjeu.apps.googleusercontent.com",
+			scope: "https://www.googleapis.com/auth/userinfo.email", immediate: mode},
+			authorizeCallback);
+		}
+
+		function userAuthed() {
+		console.log('loaded');
+		  var request =	  gapi.client.oauth2.v2.userInfo.get().execute(function(resp) {
+			alert(resp.code);
+			if (!resp.code) {
+			  // User is signed in, call my Endpoint
+			  alert("user signeding...");
+			}
+		  });
+		}
+		
+		
+function auth() {
+  signin(false, userAuthed);
+};
+	</script>
+	</body>
+</html>

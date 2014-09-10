@@ -1,75 +1,117 @@
+<!--
+  Copyright (c) 2011 Google Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+
+  To run this sample, replace YOUR API KEY with your application's API key.
+  It can be found at https://code.google.com/apis/console/?api=plus under API Access.
+  Activate the Google+ service at https://code.google.com/apis/console/ under Services
+-->
 <!DOCTYPE html>
-<html data-ng-app="smartplayds">
-	<head>
-		<link rel="stylesheet" type="text/css" href="bootstrap.css"/>
-	</head>
-	<body>
-		<p>
-			{{"hello" + " you"}}
-		</p>
-		    <p>1 + 2 = {{ 1 + 2 }}</p>
-		
-		
-		<div data-ng-controller="loginController">
-		<p>Login EmailID: <input type="text" data-ng-model="loginId"></p>
-		<p data-ng-bind="loginId"></p>
-		
-		<a href="#" onclick="auth();" id="signinButton">Sign in!</a>
-		
-		<button onclick="auth();return false;">Sign IN!</button>
+<html>
+  <head>
+    <meta charset='utf-8' />
+  </head>
+  <body>
+    <!--Add a button for the user to click to initiate auth sequence -->
+    <button id="authorize-button" style="visibility: hidden">Authorize</button>
+	
+    <script type="text/javascript">
+      // Enter a client ID for a web application from the Google Developer Console.
+      // The provided clientId will only work if the sample is run directly from
+      // https://google-api-javascript-client.googlecode.com/hg/samples/authSample.html
+      // In your Developer Console project, add a JavaScript origin that corresponds to the domain
+      // where you will be running the script.
+      var clientId = '444838946066-s4p6e92h5pvnifbt4q1itahv0c65fjeu.apps.googleusercontent.com';
 
-	</div>
-	<script type="text/javascript" src="angular.js"></script>
-	<script type="text/javascript" src="app.js"></script>
-	<script src="https://apis.google.com/js/client.js?onload=init"></script>
-	<script>
-		function loginController($scope,$http){
-			/*$scope.loginId="abc@gmail.com";
-			 $http.get("https://rvacore-test.appspot.com/_ah/api/core/v0/user?username=sreenivasulu.kaluva@gmail.com")
-			.success(function(response) {$scope.names = response;});
+      // Enter the API key from the Google Develoepr Console - to handle any unauthenticated
+      // requests in the code.
+      // The provided key works for this sample only when run from
+      // https://google-api-javascript-client.googlecode.com/hg/samples/authSample.html
+      // To use in your own application, replace this API key with your own.
+      var apiKey = 'AIzaSyDng7IudEAYAhFwxwKyv7eVjqjJo07Z16g';
+
+      // To enter one or more authentication scopes, refer to the documentation for the API.
+      var scopes = 'https://www.googleapis.com/auth/plus.me';
+
+      // Use a button to handle authentication the first time.
+      function handleClientLoad() {
+        gapi.client.setApiKey(apiKey);
+        window.setTimeout(checkAuth,1);
+      }
+
+      function checkAuth() {
+        gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
+      }
+
+
+      function handleAuthResult(authResult) {
+        var authorizeButton = document.getElementById('authorize-button');
+        if (authResult && !authResult.error) {
+          authorizeButton.style.visibility = 'hidden';
+          makeApiCall();
+        } else {
+          authorizeButton.style.visibility = '';
+          authorizeButton.onclick = handleAuthClick;
+        }
+      }
+
+      function handleAuthClick(event) {
+        gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
+        return false;
+      }
+
+      // Load the API and make an API call.  Display the results on the screen.
+      function makeApiCall111() {
+        gapi.client.load('plus', 'v1', function() {
+          var request = gapi.client.plus.people.get({
+            'userId': 'me'
+          });
+          request.execute(function(resp) {
+            var heading = document.createElement('h4');
+			if(resp.error==null){
+            var image = document.createElement('img');
+            image.src = resp.image.url;
+            heading.appendChild(image);
+            heading.appendChild(document.createTextNode(resp.displayName));
+			}else{
+				heading.appendChild(document.createTextNode(JSON.stringify(resp)));
+			}
 			
-			*/
-			/*var ROOT = "https://rvacore-test.appspot.appspot.com/_ah/api";
-			gapi.client.load('core.user.get', 'v0', function() {
-			  doSomethingAfterLoading();
-			}, ROOT);*/
-		}
-		
-		
-		function init() {
-		  var apisToLoad;
-		  var loadCallback = function() {
-			if (--apisToLoad == 0) {
-			  signin(true, userAuthed);
-			}
-		  };
-
-		  apisToLoad = 2; // must match number of calls to gapi.client.load()
-		  apiRoot = "https://rvacore-test.appspot.appspot.com/_ah/api";
-		  gapi.client.load('core.user.get', 'v0', loadCallback, apiRoot);
-		  gapi.client.load('oauth2', 'v2', loadCallback);
-		}
-
-		function signin(mode, authorizeCallback) {
-		  gapi.auth.authorize({client_id: "444838946066-s4p6e92h5pvnifbt4q1itahv0c65fjeu.apps.googleusercontent.com",
-			scope: "https://www.googleapis.com/auth/userinfo.email", immediate: mode},
-			authorizeCallback);
-		}
-
-		function userAuthed() {
-		  var request =	  gapi.client.oauth2.userinfo.get().execute(function(resp) {
-			alert(resp.code);
-			if (!resp.code) {
-			  // User is signed in, call my Endpoint
-			  alert("user signeding...");
-			}
-		  });
-		}
-		
-		
-function auth() {
-  signin(false, userAuthed);
-};
-	</script>
-	</body>
+            document.getElementById('content').appendChild(heading);
+          });
+        });
+      }
+	  
+	  function makeApiCall() {
+		handleRVLogin();
+	  }
+	  
+	  function handleRVLogin(){
+	  var apiRoot = "https://rvacore-test.appspot.appspot.com/_ah/api";
+	  gapi.client.load('core', 'v0', function() {
+	  var request = gapi.client.core.user.get({
+            'username': 'sreenivasulu.kaluva@gmail.com'
+          });
+		  
+		 request.execute(function(resp) {
+			cosole.log("loaded..."+resp);
+		 });
+	  },apiRoot);
+	  }
+    </script>
+    <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+    <div id="content"></div>
+    <p>Retrieves your profile nameee using the Google Plus API.</p>
+  </body>
 </html>
