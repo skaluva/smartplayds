@@ -42,7 +42,9 @@
       var apiKey = 'AIzaSyDng7IudEAYAhFwxwKyv7eVjqjJo07Z16g';
 
       // To enter one or more authentication scopes, refer to the documentation for the API.
-      var scopes = 'https://www.googleapis.com/auth/plus.me';
+      //var scopes = 'https://www.googleapis.com/auth/plus.me';
+      
+      var scopes='https://www.googleapis.com/auth/userinfo.email';
 
       // Use a button to handle authentication the first time.
       function handleClientLoad() {
@@ -50,8 +52,14 @@
         window.setTimeout(checkAuth,1);
       }
 
-      function checkAuth() {
+      function checkAuth_old() {
         gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
+      }
+      
+      function checkAuth() {
+        //gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
+        
+        gapi.client.load('oauth2', 'v2', handleAuthClick);
       }
 
 
@@ -98,14 +106,17 @@
 	  }
 	  
 	  function handleRVLogin(){
-	  var apiRoot = "https://rvacore-test.appspot.appspot.com/_ah/api";
+	  var apiRoot = "https://rvacore-test.appspot.com/_ah/api";
 	  gapi.client.load('core', 'v0', function() {
 	  var request = gapi.client.core.user.get({
             'username': 'sreenivasulu.kaluva@gmail.com'
           });
 		  
 		 request.execute(function(resp) {
-			cosole.log("loaded..."+resp);
+			console.log("loaded..."+JSON.stringify(resp));
+			var heading = document.createElement('h4');
+			heading.appendChild(document.createTextNode(JSON.stringify(resp)));
+			document.getElementById('content').appendChild(heading);
 		 });
 	  },apiRoot);
 	  }
