@@ -26,6 +26,8 @@
     <!--Add a button for the user to click to initiate auth sequence -->
     <button id="authorize-button" style="visibility: hidden">Authorize</button>
 	
+	<button id="list-users-button" style="visibility: hidden">List Users</button>
+	
     <script type="text/javascript">
       // Enter a client ID for a web application from the Google Developer Console.
       // The provided clientId will only work if the sample is run directly from
@@ -57,9 +59,9 @@
       }
       
       function checkAuth() {
-        //gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
+        gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
         
-        gapi.client.load('oauth2', 'v2', handleAuthClick);
+        //gapi.client.load('oauth2', 'v2', handleAuthClick);
       }
 
 
@@ -67,7 +69,8 @@
         var authorizeButton = document.getElementById('authorize-button');
         if (authResult && !authResult.error) {
           authorizeButton.style.visibility = 'hidden';
-          makeApiCall();
+          //makeApiCall();
+          handleLogin();
         } else {
           authorizeButton.style.visibility = '';
           authorizeButton.onclick = handleAuthClick;
@@ -101,22 +104,45 @@
         });
       }
 	  
-	  function makeApiCall() {
+	  /*function makeApiCall() {
 		handleRVLogin();
-	  }
+	  }*/
 	  
-	  function handleRVLogin(){
 	  var apiRoot = "https://rvacore-test.appspot.com/_ah/api";
+	  
+	  function handleLogin(){
 	  gapi.client.load('core', 'v0', function() {
 	  var request = gapi.client.core.user.get({
-            'username': 'sreenivasulu.kaluva@gmail.com'
+            //'username': 'sreenivasulu.kaluva@gmail.com'
           });
 		  
 		 request.execute(function(resp) {
 			console.log("loaded..."+JSON.stringify(resp));
 			var heading = document.createElement('h4');
-			heading.appendChild(document.createTextNode(JSON.stringify(resp)));
+			heading.appendChild(document.createTextNode(JSON.stringify(resp.item)));
 			document.getElementById('content').appendChild(heading);
+			
+			var listusersButton = document.getElementById('list-users-button');
+			listusersButton.style.visibility = '';
+			listusersButton.onclick = handleListUsers;
+		 });
+	  },apiRoot);
+	  }
+	  
+	  
+	  function handleListUsers(){
+	  gapi.client.load('core', 'v0', function() {
+	  var request = gapi.client.core.user.list({
+            //'username': 'sreenivasulu.kaluva@gmail.com'
+          });
+		  
+		 request.execute(function(resp) {
+			console.log("loaded..."+JSON.stringify(resp));
+			var heading = document.createElement('h4');
+			heading.appendChild(document.createTextNode(JSON.stringify(resp.items)));
+			document.getElementById('content').appendChild(heading);
+			
+			
 		 });
 	  },apiRoot);
 	  }
