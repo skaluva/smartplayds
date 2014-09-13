@@ -49,6 +49,12 @@ angular.module('googleApi', [])
 
                     return deferred.promise;
                 },
+                
+                loginWithCallback: function (callback) {
+                    gapi.auth.authorize({ client_id: config.clientId, scope: config.scopes, immediate: false}, this.handleAuthResult);
+
+                    return deferred.promise.then(callback);
+                },
 
                 handleClientLoad: function () {
                     gapi.auth.init(function () { });

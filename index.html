@@ -12,7 +12,7 @@
 		<button data-ng-click="rvaLogin()" class="btn btn-primary">Login</button>
 		<button data-ng-click="listUsers()" class="btn btn-primary">List Users</button>
 
-	<div data-ng-show="currentUser">
+	<div data-ng-show="currentUser" id="loginUser" style="display:none">
     <h1>You're authenticated!</h1>
 
     Logged in as {{currentUser.displayName}} <img data-ng-src="{{currentUser.image.url}}">

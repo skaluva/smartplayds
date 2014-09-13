@@ -10,19 +10,20 @@ angular.module('smartplayds', ["googleApi"])
 	.controller('MainCtrl', ['$scope', 'googleLogin', 'googlePlus', function ($scope, googleLogin,googlePlus) {
 
 		$scope.authenticated = false;
-		
 		$scope.login = function () {
 			//~ console.log("5555");
 			googleLogin.login();
 		};
 		
-		$scope.$on("google:authenticated",function(){
+		$scope.$on("google:authenticated",function(res){
 			$scope.authenticated=true;
-			//~ console.log("11111");
+			
+			//console.log("11111:"+JSON.stringify(res));
 			$scope.$on("googlePlus:loaded", function() {
 				//~ console.log("2222");
 			  googlePlus.getCurrentUser().then(function(user) {
 				$scope.currentUser = user;
+				$('#loginUser').show();
 				//~ console.log("3333");
 				//~ console.log("calling get user info of rva api...");
 			  });
@@ -30,40 +31,20 @@ angular.module('smartplayds', ["googleApi"])
 		});
 		$scope.currentUser = googleLogin.currentUser;
 
+
 		
 		$scope.rvaLogin=function(){
-				googleLogin.login();// first do google login...
-				//~ console.log("6666");
-				var apiRoot='https://rvacore-test.appspot.com/_ah/api';
-				gapi.client.load('core', 'v0', function() {
-				var request = gapi.client.core.user.get({
-					//'username': 'sreenivasulu.kaluva@gmail.com'
-					  });
-					  
-					 request.execute(function(resp) {
-						var res="<b>----RiseVision User Details----</b><br><pre>";
-						if(resp.error!=null){
-							res+=JSON.stringify(resp.error,null,2);
-						}else{
-							res+=JSON.stringify(resp.result,null,2);
-						}
-						res+="</pre>";
-						
-						$('#user-details').html(res);
-					 });
-				},apiRoot);
-		}
-		
-		$scope.listUsers=function(){
-				googleLogin.login();// first do google login...
-				var apiRoot='https://rvacore-test.appspot.com/_ah/api';
-				gapi.client.load('core', 'v0', function() {
-				  var request = gapi.client.core.user.list({
+				
+				postLogin=function(){
+						//~ console.log("6666");
+					var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+					gapi.client.load('core', 'v0', function() {
+					var request = gapi.client.core.user.get({
 						//'username': 'sreenivasulu.kaluva@gmail.com'
-					  });
-					  
-					 request.execute(function(resp) {
-							var res="<b>----Users List for this user----</b><br><pre>";
+						  });
+						  
+						 request.execute(function(resp) {
+							var res="<b>----RiseVision User Details----</b><br><pre>";
 							if(resp.error!=null){
 								res+=JSON.stringify(resp.error,null,2);
 							}else{
@@ -71,9 +52,37 @@ angular.module('smartplayds', ["googleApi"])
 							}
 							res+="</pre>";
 							
-							//heading.appendChild(document.createTextNode(res));
-							$('#user-list').html(res);
-					 });
-				  },apiRoot);
+							$('#user-details').html(res);
+						 });
+					},apiRoot);
+				}
+				
+				googleLogin.loginWithCallback(postLogin);//validate login and invoke rva api..
+		}
+		
+		$scope.listUsers=function(){
+				invoke=function(){
+					var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+					gapi.client.load('core', 'v0', function() {
+					  var request = gapi.client.core.user.list({
+							//'username': 'sreenivasulu.kaluva@gmail.com'
+						  });
+						  
+						 request.execute(function(resp) {
+								var res="<b>----Users List for this user----</b><br><pre>";
+								if(resp.error!=null){
+									res+=JSON.stringify(resp.error,null,2);
+								}else{
+									res+=JSON.stringify(resp.result,null,2);
+								}
+								res+="</pre>";
+								
+								//heading.appendChild(document.createTextNode(res));
+								$('#user-list').html(res);
+						 });
+					  },apiRoot);
+				}
+				
+				googleLogin.loginWithCallback(invoke);//validate login and invoke rva api..
 		}
 	}]);
