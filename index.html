@@ -11,6 +11,7 @@
 		<!--div data-ng-controller="loginController"-->
 		<button data-ng-click="rvaLogin()" class="btn btn-primary">Login</button>
 		<button data-ng-click="listUsers()" class="btn btn-primary">List Users</button>
+		<button data-ng-click="listTemplates()" class="btn btn-primary">List Templates</button>
 
 	<div data-ng-show="currentUser" id="loginUser" style="display:none">
     <h1>You're authenticated!</h1>
@@ -19,6 +20,7 @@
     </div>
     <div id="user-details"></div>
     <div id="user-list"></div>
+	<div id="template-list"></div>
     <script type="text/javascript" src="js/vendor/jquery-2.1.1.js"></script>
     <script type="text/javascript" src="js/vendor/angular.js"></script>
 	<script type="text/javascript" src="js/vendor/angular-googleapi.js"></script>

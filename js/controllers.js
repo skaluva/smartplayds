@@ -30,8 +30,32 @@ angular.module('smartplayds', ["googleApi"])
 			})
 		});
 		$scope.currentUser = googleLogin.currentUser;
-
-
+/*
+	{
+  "item": {
+    "id": "a39fef2c-1030-4dd0-ab9e-aa24685fb0db",
+    "companyId": "2d89b40e-8e16-4116-b60b-0cbaf8446d39",
+    "username": "sreenivasulu.kaluva@gmail.com",
+    "creationDate": "2014-09-02T18:42:43.200Z",
+    "email": "sreenivasulu.kaluva@gmail.com",
+    "lastLogin": "2014-09-16T09:51:56.629Z",
+    "status": 1,
+    "roles": [
+      "ce",
+      "cp",
+      "da",
+      "ua"
+    ],
+    "termsAcceptanceDate": "2014-09-03T06:26:29.000Z",
+    "showTutorial": false,
+    "mailSyncEnabled": false,
+    "changedBy": "gigaep@gmail.com",
+    "changeDate": "2014-09-03T07:41:16.860Z"
+  },
+  "kind": "core#userItem",
+  "etag": "\"ILARndlgR_krPGplr1hl3jBUckw/sYiKGxukF8hhd8OznoTP1GuCn5A\""
+}
+*/
 		
 		$scope.rvaLogin=function(){
 				
@@ -49,6 +73,9 @@ angular.module('smartplayds', ["googleApi"])
 								res+=JSON.stringify(resp.error,null,2);
 							}else{
 								res+=JSON.stringify(resp.result,null,2);
+								$scope.currentUser.id=resp.result.item.id;
+								$scope.currentUser.companyId=resp.result.item.companyId;
+								//alert($scope.currentUser);
 							}
 							res+="</pre>";
 							
@@ -85,4 +112,54 @@ angular.module('smartplayds', ["googleApi"])
 				
 				googleLogin.loginWithCallback(invoke);//validate login and invoke rva api..
 		}
+		
+		$scope.listTemplates=function(){
+			alert('list templates clicked..'+$scope.currentUser.companyId);
+			var apiRoot='https://rvacore-test.appspot.com/v1/company/'+$scope.currentUser.companyId+'/templates';
+			/*function writeResponse(resp) {
+			  var responseText;
+			  
+			  if (resp.error && resp.error.errors[0].debugInfo == 'QuotaState: BLOCKED') {
+				responseText = 'Invalid API key provided. Please replace the "apiKey" value with your own.';
+			  } else {
+				//responseText = 'Short URL ' + shortUrl + ' expands to ' + resp.longUrl;
+			  }
+			  $('#template-list').html(resp);
+			}
+
+			//var shortUrl = document.getElementById('shortUrl').value;
+			var restRequest = gapi.client.request({
+			   'path': apiRoot
+			   'params' : {'shortUrl' : shortUrl}
+			});
+
+			restRequest.execute(writeResponse);*/
+			/*
+			
+			$.get(
+			apiRoot,{},
+			//{paramOne : 1, paramX : 'abc'},
+			function(data) {
+			   alert('page content: ' + data);
+			});*/
+			
+			var xmlhttp = new XMLHttpRequest();
+		var oauthToken = gapi.auth.getToken();
+		xmlhttp.open('GET',apiRoot);
+		xmlhttp.onreadystatechange=function()
+		  {
+		  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			{
+			//document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+			 $('#template-list').html(xmlhttp.responseText);
+			}
+		  } 
+		xmlhttp.setRequestHeader('Access-Control-Allow-Origin','http://localhost:9000');
+		xmlhttp.setRequestHeader('Authorization','Bearer ' + oauthToken.access_token);
+		
+		xmlhttp.send();
+
+			
+			
+		}	
 	}]);
