@@ -12,13 +12,6 @@
 		<button data-ng-click="login()" class="btn btn-primary">Login</button>
 		<button data-ng-click="listUsers()" class="btn btn-primary">List Users</button>
 		<button data-ng-click="listPresentations()" class="btn btn-primary">List Presentations</button>
-		<div class="input-group">
-		<label class="label label-default">Presentation ID</label>
-        <input class="form-control" data-ng-model="presentationId" type="text"/>
-        <span class="input-group-btn">
-          <button class="btn btn-primary" data-ng-click="getPresentation(presentationId)">Get Presentation</button>
-        </span>
-		</div>
 		
 
 	<div data-ng-show="currentUser" id="loginUser">
@@ -39,7 +32,20 @@
     
     <div class="panel panel-default" data-ng-show="presentationList" >
 		<div class="panel-heading"> Presentation List </div>
-		<div class="panel-body" data-ng-bind-html="presentationList"></div>
+		
+		<div class="panel-body" data-ng-show="presentationList.items.length" style="margin-left:30px;">
+			<span data-ng-repeat="p in presentationList.items">
+				<label class="radio" for="{{p.id}}">
+					<input type="radio" value="{{p.id}}" data-ng-model="pres" name="group" id="{{p.id}}" data-ng-click="getPresentation(p.id)"/>
+				{{p.id}} ({{p.name}})
+			</label>
+			<button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="publishPresentation(p.id)">Publish</button>
+			<button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="deletePresentation(p.id)">Delete</button>
+		</span>
+		</div>
+		
+		<div data-ng-show="resp" data-ng-bind-html="resp"> </div>
+		
 	</div>
 	
 	<div class="panel panel-default" data-ng-show="presentationInfo" style="position:absolute;width:100%;height:100%" >
