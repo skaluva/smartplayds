@@ -107,7 +107,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				 request.execute(function(resp) {
 					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
 					
-					$scope.presentationInfo=(resp.error!=null?"<pre>"+JSON.stringify(resp.error,null,2)+"</pre>":resp.item.layout);
+					$scope.presentationInfo=resp.error!=null?"<pre>"+JSON.stringify(resp.error,null,2)+"</pre>":resp.item.layout;
 					$scope.$apply();
 				 });
 			  },apiRoot);				
@@ -122,7 +122,14 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				  
 				 request.execute(function(resp) {
 					//$scope.presentationList="<pre>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
-					$scope.presentationList=resp.error!=null?"<pre>"+JSON.stringify(resp.error,null,2)+"</pre>":resp.result;
+					if(resp.error!=null){
+						$scope.presentationListRespError="<pre>"+JSON.stringify(resp.error,null,2)+"</pre>";
+					}else{
+						$scope.presentationListRespError=null;
+						$scope.presentationList=resp.result;	
+					}
+					
+					
 					$scope.$apply();
 				 });
 			  },apiRoot);				
@@ -138,10 +145,6 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				  });
 				  
 				 request.execute(function(resp) {
-					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
-					
-					
-					//$scope.presentationInfo=(resp.error!=null?"<pre>"+JSON.stringify(resp.error,null,2)+"</pre>":resp.result);
 					
 					
 					$scope.resp="<pre>***PUBLISH "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
@@ -161,12 +164,19 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				 request.execute(function(resp) {
 					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
 					
-					$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
+					if(resp.error!=null){
+						alert("Error occurred, Try Again!");
+						$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
+						$scope.$apply();
+					}else{
+						$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
+						$scope.$apply(function(){
+							alert("Presentation "+presentationId+" deleted successfully!");	
+							$scope.listPresentations();		
+						});
+					}
 					
-					//$scope.presentationInfo=(resp.error!=null?"<pre>"+JSON.stringify(resp.error,null,2)+"</pre>":resp.result);
-					$scope.$apply();
 					
-					$scope.listPresentations();
 				 });
 			  },apiRoot);				
 		}

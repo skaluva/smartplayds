@@ -30,9 +30,10 @@
 	</div>
 	
     
-    <div class="panel panel-default" data-ng-show="presentationList" >
+    <div class="panel panel-default" data-ng-show="presentationList || presentationListRespError" >
 		<div class="panel-heading"> Presentation List </div>
-		
+		<div class="panel-body" data-ng-show="presentationListRespError" data-ng-bind-html="presentationListRespError"></div>
+		<div class="panel-body" data-ng-show="!presentationList.items.length" style="margin-left:30px;">No Presentations Found!</div>
 		<div class="panel-body" data-ng-show="presentationList.items.length" style="margin-left:30px;">
 			<span data-ng-repeat="p in presentationList.items">
 				<label class="radio" for="{{p.id}}">
@@ -41,11 +42,9 @@
 			</label>
 			<button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="publishPresentation(p.id)">Publish</button>
 			<button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="deletePresentation(p.id)">Delete</button>
-		</span>
+			</span>
+			<div data-ng-show="resp" data-ng-bind-html="resp"> </div>
 		</div>
-		
-		<div data-ng-show="resp" data-ng-bind-html="resp"> </div>
-		
 	</div>
 	
 	<div class="panel panel-default" data-ng-show="presentationInfo" style="position:absolute;width:100%;height:100%" >
