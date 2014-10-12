@@ -1,13 +1,18 @@
-angular.module('smartplayds', ["googleApi"])
+angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
     .config(function(googleLoginProvider) {
         googleLoginProvider.configure({
             clientId: '444838946066-s4p6e92h5pvnifbt4q1itahv0c65fjeu.apps.googleusercontent.com',
             apiKey:'AIzaSyDng7IudEAYAhFwxwKyv7eVjqjJo07Z16g',
             scopes: ["https://www.googleapis.com/auth/userinfo.email"/*, "https://www.googleapis.com/auth/calendar"*/, "https://www.googleapis.com/auth/plus.login"]
          });
+	 })
+	 .filter("unsafe",function($sce){
+		 return function(val){
+			 return $sce.trustAsHtml(val);
+		 }
 	 }) 
 	 
-	.controller('MainCtrl', ['$scope', 'googleLogin', 'googlePlus', function ($scope, googleLogin,googlePlus) {
+	.controller('MainCtrl', ['$scope', 'googleLogin', 'googlePlus', '$sce', function ($scope, googleLogin,googlePlus,$sce) {
 
 		$scope.authenticated = false;
 		$scope.login = function () {
@@ -23,13 +28,15 @@ angular.module('smartplayds', ["googleApi"])
 				//~ console.log("2222");
 			  googlePlus.getCurrentUser().then(function(user) {
 				$scope.currentUser = user;
-				$('#loginUser').show();
-				//~ console.log("3333");
-				//~ console.log("calling get user info of rva api...");
+				$scope.rvaLogin();	
 			  });
 			})
 		});
 		$scope.currentUser = googleLogin.currentUser;
+		$scope.renderHtml = function (htmlCode) {
+            return $sce.trustAsHtml(htmlCode);
+        };
+
 /*
 	{
   "item": {
@@ -58,9 +65,6 @@ angular.module('smartplayds', ["googleApi"])
 */
 		
 		$scope.rvaLogin=function(){
-				
-				postLogin=function(){
-						//~ console.log("6666");
 					var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 					gapi.client.load('core', 'v0', function() {
 					var request = gapi.client.core.user.get({
@@ -68,98 +72,59 @@ angular.module('smartplayds', ["googleApi"])
 						  });
 						  
 						 request.execute(function(resp) {
-							var res="<b>----RiseVision User Details----</b><br><pre>";
-							if(resp.error!=null){
-								res+=JSON.stringify(resp.error,null,2);
-							}else{
-								res+=JSON.stringify(resp.result,null,2);
-								$scope.currentUser.id=resp.result.item.id;
-								$scope.currentUser.companyId=resp.result.item.companyId;
-								//alert($scope.currentUser);
-							}
-							res+="</pre>";
-							
-							$('#user-details').html(res);
+
+							$scope.userDetails="<pre>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
+							$scope.$apply();
 						 });
 					},apiRoot);
-				}
+				//}
 				
-				googleLogin.loginWithCallback(postLogin);//validate login and invoke rva api..
+				//postLogin();//validate login and invoke rva api..
 		}
 		
 		$scope.listUsers=function(){
-				invoke=function(){
-					var apiRoot='https://rvacore-test.appspot.com/_ah/api';
-					gapi.client.load('core', 'v0', function() {
-					  var request = gapi.client.core.user.list({
-							//'username': 'sreenivasulu.kaluva@gmail.com'
-						  });
-						  
-						 request.execute(function(resp) {
-								var res="<b>----Users List for this user----</b><br><pre>";
-								if(resp.error!=null){
-									res+=JSON.stringify(resp.error,null,2);
-								}else{
-									res+=JSON.stringify(resp.result,null,2);
-								}
-								res+="</pre>";
-								
-								//heading.appendChild(document.createTextNode(res));
-								$('#user-list').html(res);
-						 });
-					  },apiRoot);
-				}
-				
-				googleLogin.loginWithCallback(invoke);//validate login and invoke rva api..
+			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			gapi.client.load('core', 'v0', function() {
+			  var request = gapi.client.core.user.list({
+					//'username': 'sreenivasulu.kaluva@gmail.com'
+				  });
+				  
+				 request.execute(function(resp) {
+					$scope.userList="<pre>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
+					$scope.$apply();
+				 });
+			  },apiRoot);
 		}
 		
-		$scope.listTemplates=function(){
-			alert('list templates clicked..'+$scope.currentUser.companyId);
-			var apiRoot='https://rvacore-test.appspot.com/v1/company/'+$scope.currentUser.companyId+'/templates';
-			/*function writeResponse(resp) {
-			  var responseText;
-			  
-			  if (resp.error && resp.error.errors[0].debugInfo == 'QuotaState: BLOCKED') {
-				responseText = 'Invalid API key provided. Please replace the "apiKey" value with your own.';
-			  } else {
-				//responseText = 'Short URL ' + shortUrl + ' expands to ' + resp.longUrl;
-			  }
-			  $('#template-list').html(resp);
-			}
-
-			//var shortUrl = document.getElementById('shortUrl').value;
-			var restRequest = gapi.client.request({
-			   'path': apiRoot
-			   'params' : {'shortUrl' : shortUrl}
-			});
-
-			restRequest.execute(writeResponse);*/
-			/*
-			
-			$.get(
-			apiRoot,{},
-			//{paramOne : 1, paramX : 'abc'},
-			function(data) {
-			   alert('page content: ' + data);
-			});*/
-			
-			var xmlhttp = new XMLHttpRequest();
-		var oauthToken = gapi.auth.getToken();
-		xmlhttp.open('GET',apiRoot);
-		xmlhttp.onreadystatechange=function()
-		  {
-		  if (xmlhttp.readyState==4 && xmlhttp.status==200)
-			{
-			//document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
-			 $('#template-list').html(xmlhttp.responseText);
-			}
-		  } 
-		xmlhttp.setRequestHeader('Access-Control-Allow-Origin','http://localhost:9000');
-		xmlhttp.setRequestHeader('Authorization','Bearer ' + oauthToken.access_token);
+		$scope.getPresentation=function(presentationId){
+			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			gapi.client.load('core', 'v0', function() {
+			  var request = gapi.client.core.presentation.get({
+					//'username': 'sreenivasulu.kaluva@gmail.com'
+					id:presentationId
+				  });
+				  
+				 request.execute(function(resp) {
+					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
+					
+					$scope.presentationInfo=(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout);
+					$scope.$apply();
+				 });
+			  },apiRoot);				
+		}
 		
-		xmlhttp.send();
-
-			
-			
+		$scope.listPresentations=function(presentationId){
+			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			gapi.client.load('core', 'v0', function() {
+			  var request = gapi.client.core.presentation.list({
+					//'username': 'sreenivasulu.kaluva@gmail.com'
+				  });
+				  
+				 request.execute(function(resp) {
+					$scope.presentationList="<pre>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
+					$scope.$apply();
+				 });
+			  },apiRoot);				
+				
 		}	
 	}]);
