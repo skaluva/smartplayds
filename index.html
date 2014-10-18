@@ -29,8 +29,8 @@
 		<div class="panel-body" data-ng-bind-html="userList"></div>
 	</div>
 	
-    <div class="container" data-ng-show="showNewPresForm" style="float:left">
-	<div class="panel panel-default" >
+    <div class="container" data-ng-show="showNewPresForm" style="float:left; width:100%">
+	<div class="panel panel-default" style="margin:10px">
 		<div class="panel-heading" style> New Presentation Form </div>
 		
 		<form novalidate role="form" class="simple-form" name="presForm">
@@ -61,6 +61,7 @@
 		</form>
 	</div>
 	</div>
+	
 	
 	<div class="panel panel-default" data-ng-show="presentationList || presentationListRespError" >
 		<div class="panel-heading"> Presentation List </div>
