@@ -74,6 +74,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 						 request.execute(function(resp) {
 
 							$scope.userDetails="<pre>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
+							$scope.currentUser.companyId=resp.result.item.companyId;
 							$scope.$apply();
 						 });
 					},apiRoot);
@@ -83,6 +84,10 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		}
 		
 		$scope.listUsers=function(){
+			if(!$scope.authenticated){
+				alert("Please login!");
+				return;
+			}
 			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.user.list({
@@ -97,6 +102,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		}
 		
 		$scope.getPresentation=function(presentationId){
+			//$scope.showEditPresForm=false;
 			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.get({
@@ -114,6 +120,10 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		}
 		
 		$scope.listPresentations=function(presentationId){
+			if(!$scope.authenticated){
+				alert("Please login!");
+				return;
+			}
 			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.list({
@@ -179,5 +189,140 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 					
 				 });
 			  },apiRoot);				
+		}
+		
+		
+	/*{
+			name: "test presentation one",
+			publish: 0,
+			layout: "hello..this is simple text..",
+			isTemplate: false
+		}*/	
+		
+		$scope.showNewPresentationForm=function(){
+			if(!$scope.authenticated){
+				alert("Please login!");
+				return;
+			}
+			
+			$scope.showNewPresForm=true;
+		}
+		
+		$scope.createPresentation=function(pres,presForm){
+			
+			
+			$scope.submitted=true;
+			if (presForm.$invalid) {
+				return;
+			}
+			
+			
+			var data={
+				"name": pres.name,
+				"publish": pres.publishTo,
+				"layout":pres.layout,
+				"isTemplate":pres.isTemplate
+			}
+			
+			
+			alert("companyId: "+$scope.currentUser.companyId);
+			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			gapi.client.load('core', 'v0', function() {
+			  var request = gapi.client.core.presentation.add({
+					companyId:$scope.currentUser.companyId,
+					data: JSON.stringify(data)
+				  });
+				  
+				 request.execute(function(resp) {
+					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
+					
+					if(resp.error!=null){
+						alert("Error occurred, Try Again!");
+						$scope.createResp="<pre>***CREATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
+						$scope.$apply();
+					}else{
+						$scope.createResp="<pre>***CREATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
+						$scope.$apply(function(){
+							alert("Presentation "+pres.name+" added successfully!");	
+							//$scope.listPresentations();		
+						});
+					}
+					
+				 });
+			  },apiRoot);				
+		}
+		
+		$scope.editPresentation=function(presId){
+			
+			$scope.showEditPresForm=true;
+			
+			//alert("companyId: "+$scope.currentUser.companyId);
+			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			gapi.client.load('core', 'v0', function() {
+			  var request = gapi.client.core.presentation.get({
+					id:presId,
+					//data: JSON.stringify(data)
+				  });
+				  
+				 request.execute(function(resp) {
+					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
+					
+					$scope.editPres=resp.item;
+					$scope.$apply();
+					
+				 });
+			  },apiRoot);				
+		}
+		
+		$scope.updatePresentation=function(pres,presForm){
+			
+			
+			$scope.submitted=true;
+			if (presForm.$invalid) {
+				return;
+			}
+			
+			
+			var data={
+				"name": pres.name,
+				"publish": pres.publish,
+				"layout":pres.layout,
+				"isTemplate":pres.isTemplate
+			}
+			
+			
+			//alert("companyId: "+$scope.currentUser.companyId);
+			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			gapi.client.load('core', 'v0', function() {
+			  var request = gapi.client.core.presentation.update({
+					id:pres.id,
+					data: JSON.stringify(data)
+				  });
+				  
+				 request.execute(function(resp) {
+					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
+					
+					if(resp.error!=null){
+						alert("Error occurred, Try Again!");
+						$scope.updateResp="<pre>***UPDATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
+						$scope.$apply();
+					}else{
+						$scope.updateResp="<pre>***UPDATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
+						$scope.$apply(function(){
+							alert("Presentation "+pres.name+" updated successfully!");	
+							//$scope.listPresentations();		
+						});
+					}
+					
+				 });
+			  },apiRoot);				
+		}
+		
+		$scope.reset = function() {
+			if($scope.showEditPresForm){
+				$scope.showEditPresForm=false;
+				$scope.editPres = {};	
+			}
+			
 		}
 	}]);
