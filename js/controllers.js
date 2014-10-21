@@ -1,18 +1,21 @@
 angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
+	.constant("API_ROOT","https://rvacore-test.appspot.com/_ah/api")
+    
     .config(function(googleLoginProvider) {
         googleLoginProvider.configure({
             clientId: '444838946066-s4p6e92h5pvnifbt4q1itahv0c65fjeu.apps.googleusercontent.com',
             apiKey:'AIzaSyDng7IudEAYAhFwxwKyv7eVjqjJo07Z16g',
-            scopes: ["https://www.googleapis.com/auth/userinfo.email"/*, "https://www.googleapis.com/auth/calendar"*/, "https://www.googleapis.com/auth/plus.login"]
+            scopes: ["https://www.googleapis.com/auth/userinfo.email"/*, "https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/plus.login"*/]
          });
 	 })
+	 
 	 .filter("unsafe",function($sce){
 		 return function(val){
 			 return $sce.trustAsHtml(val);
 		 }
 	 }) 
 	 
-	.controller('MainCtrl', ['$scope', 'googleLogin', 'googlePlus', '$sce', function ($scope, googleLogin,googlePlus,$sce) {
+	.controller('MainCtrl', ['$scope', 'googleLogin', /*'googlePlus',*/'API_ROOT',  function ($scope, googleLogin,/*googlePlus,*/apiRoot) {
 
 		$scope.authenticated = false;
 		$scope.login = function () {
@@ -22,50 +25,27 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		
 		$scope.$on("google:authenticated",function(res){
 			$scope.authenticated=true;
-			
+			$scope.currentUser = googleLogin.currentUser;	
 			//console.log("11111:"+JSON.stringify(res));
-			$scope.$on("googlePlus:loaded", function() {
+			/*$scope.$on("googlePlus:loaded", function() {
 				//~ console.log("2222");
 			  googlePlus.getCurrentUser().then(function(user) {
 				$scope.currentUser = user;
 				$scope.rvaLogin();	
 			  });
-			})
+			})*/
 		});
-		$scope.currentUser = googleLogin.currentUser;
-		$scope.renderHtml = function (htmlCode) {
-            return $sce.trustAsHtml(htmlCode);
-        };
-
-/*
-	{
-  "item": {
-    "id": "a39fef2c-1030-4dd0-ab9e-aa24685fb0db",
-    "companyId": "2d89b40e-8e16-4116-b60b-0cbaf8446d39",
-    "username": "sreenivasulu.kaluva@gmail.com",
-    "creationDate": "2014-09-02T18:42:43.200Z",
-    "email": "sreenivasulu.kaluva@gmail.com",
-    "lastLogin": "2014-09-16T09:51:56.629Z",
-    "status": 1,
-    "roles": [
-      "ce",
-      "cp",
-      "da",
-      "ua"
-    ],
-    "termsAcceptanceDate": "2014-09-03T06:26:29.000Z",
-    "showTutorial": false,
-    "mailSyncEnabled": false,
-    "changedBy": "gigaep@gmail.com",
-    "changeDate": "2014-09-03T07:41:16.860Z"
-  },
-  "kind": "core#userItem",
-  "etag": "\"ILARndlgR_krPGplr1hl3jBUckw/sYiKGxukF8hhd8OznoTP1GuCn5A\""
-}
-*/
+		
+		
+		
+		$scope.logout = function() {
+			googleLogin.logout();
+			$scope.authenticated=false;
+			alert("You are logged out successfully!");
+		}
 		
 		$scope.rvaLogin=function(){
-					var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+					//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 					gapi.client.load('core', 'v0', function() {
 					var request = gapi.client.core.user.get({
 						//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -88,7 +68,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				alert("Please login!");
 				return;
 			}
-			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.user.list({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -103,7 +83,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		
 		$scope.getPresentation=function(presentationId){
 			//$scope.showEditPresForm=false;
-			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.get({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -124,7 +104,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				alert("Please login!");
 				return;
 			}
-			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.list({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -147,7 +127,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		}	
 		
 		$scope.publishPresentation=function(presentationId){
-			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.publish({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -164,7 +144,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		}
 		
 		$scope.deletePresentation=function(presentationId){
-			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.delete({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -226,7 +206,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 			
 			
 			alert("companyId: "+$scope.currentUser.companyId);
-			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.add({
 					companyId:$scope.currentUser.companyId,
@@ -257,7 +237,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 			$scope.showEditPresForm=true;
 			
 			//alert("companyId: "+$scope.currentUser.companyId);
-			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.get({
 					id:presId,
@@ -292,7 +272,7 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 			
 			
 			//alert("companyId: "+$scope.currentUser.companyId);
-			var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.update({
 					id:pres.id,
@@ -323,6 +303,29 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				$scope.showEditPresForm=false;
 				$scope.editPres = {};	
 			}
-			
 		}
+
+
+		$scope.listTemplates=function(presentationId){
+			if(!$scope.authenticated){
+				alert("Please login!");
+				return;
+			}
+			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			gapi.client.load('core', 'v0', function() {
+			  var request = gapi.client.core.template.list({
+					//'username': 'sreenivasulu.kaluva@gmail.com'
+				  });
+				  
+				 request.execute(function(resp) {
+					if(resp.error!=null){
+						$scope.templateListRespError="<pre>"+JSON.stringify(resp.error,null,2)+"</pre>";
+					}else{
+						$scope.templateListRespError=null;
+						$scope.templateList=resp.result;	
+					}
+					$scope.$apply();
+				 });
+			  },apiRoot);				
+		}		
 	}]);

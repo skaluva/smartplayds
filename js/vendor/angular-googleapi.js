@@ -45,7 +45,13 @@ angular.module('googleApi', [])
             var deferred = $q.defer();
             return {
                 login: function () {
-                    gapi.auth.authorize({ client_id: config.clientId, scope: config.scopes, immediate: false}, this.handleAuthResult);
+                    gapi.auth.authorize({ client_id: config.clientId, scope: config.scopes, cookie_policy: 'single_host_origin',immediate: false}, this.handleAuthResult);
+
+                    return deferred.promise;
+                },
+                
+                logout: function () {
+                    gapi.auth.signOut(this.handleAuthResult);
 
                     return deferred.promise;
                 },
