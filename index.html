@@ -8,14 +8,13 @@
         <h1>SmartPlayDS <small>The smartest way to communicate!</small></h1>
     </div>
 		
-		<!--div data-ng-controller="loginController"-->
 		<button data-ng-click="login()" data-ng-hide="authenticated" class="btn btn-primary">Login</button>
 		<button data-ng-click="listUsers()" class="btn btn-primary">List Users</button>
 		<button data-ng-click="showNewPresentationForm()" class="btn btn-primary">Create Presentation</button>
 		<button data-ng-click="listPresentations()" class="btn btn-primary">List Presentations</button>
 		<button data-ng-click="listTemplates()" class="btn btn-primary">Create Presentation From template</button>
 		<button data-ng-click="logout()" data-ng-show="authenticated" class="btn btn-primary">Logout</button>
-		<div data-ng-show="currentUser" id="loginUser">
+		<div data-ng-show="currentUser!=null" id="loginUser">
 		<h1>You're authenticated!</h1>
 		Logged in as {{currentUser.displayName}} <img data-ng-src="{{currentUser.image.url}}">
     	    
@@ -30,96 +29,33 @@
 		</div>
 		
 		<div class="container-fluid" data-ng-show="showNewPresForm">
-		<div class="panel panel-default" style="margin:10px">
-			<div class="panel-heading" style> New Presentation Form </div>
-			
-			<form novalidate role="form" class="simple-form" name="presForm">
-				<div class="form-group">
-					<label for="name">Presentation Name</label>
-					<span class="label label-danger" data-ng-show="submitted && presForm.name.$error.required">Required!</span>	
-					<input type="text" data-ng-model="pres.name" name="name" class="form-control" required/>
-				</div>
-				
-				<div class="form-group">
-					<label for="layout">Presentation data</label>
-					<span class="label label-danger" data-ng-show="submitted && presForm.layout.$error.required">Required!</span>	
-					<textarea data-ng-model="pres.layout" name="layout" class="form-control" required></textarea>
-				</div>
-				
-				<div class="form-group">
-					<label for="publishType">Publish To</label>
-					<input type="radio" value="0" data-ng-model="pres.publishTo" name="publishType" data-ng-init="pres.publishTo=0" data-ng-checked="true"/> Only Signed In Users
-					<input type="radio" value="1" data-ng-model="pres.publishTo" name="publishType" /> Everyone					
-				</div>
-				
-				<div class="form-group">
-					<label for="presIsTemplate">Is Template? </label>
-					<input type="checkbox" data-ng-model="pres.isTemplate" name="presIsTemplate" data-ng-init="pres.isTemplate=false" value="false"/>
-				</div>	          
-				
-				<button class="btn btn-primary" data-ng-click="createPresentation(pres,presForm)">Submit</button>			
-			</form>
-		</div>
+			<data-ng-include src="'presentationForm.html'"></data-ng-include>
 		</div>
 		
-		
-		<div class="container" data-ng-show="presentationList || presentationListRespError" style="float:left; width:100%">
-			<div class="panel-heading"> Presentation List </div>
-			<div class="panel-body" data-ng-show="presentationListRespError" data-ng-bind-html="presentationListRespError"></div>
-			<div class="panel-body" data-ng-show="!presentationList.items.length" style="margin-left:30px;">No Presentations Found!</div>
-			<div class="panel-body" data-ng-show="presentationList.items.length" style="margin-left:30px;">
-				<span data-ng-repeat="p in presentationList.items">
-					<label class="radio" for="{{p.id}}">
-						<input type="radio" value="{{p.id}}" data-ng-model="pres" name="group" id="{{p.id}}" data-ng-click="reset();getPresentation(p.id)"/>
-					{{p.id}} ({{p.name}})
-				</label>
-				<button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="publishPresentation(p.id)">Publish</button>
-				<button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="deletePresentation(p.id)">Delete</button>
-				<button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="editPresentation(p.id)">Edit</button>
-				</span>
-				<div data-ng-show="resp" data-ng-bind-html="resp"> </div>
-				
-				<div class="container" data-ng-show="showEditPresForm==true">
-				<div class="panel panel-default"  >
-					
-					<div class="panel-heading" style> Edit Presentation </div>
-					
-					<form novalidate role="form" class="simple-form" name="editPresForm">
-						<div class="form-group">
-							<label>Presentation ID : </label>{{editPres.id}}
-							<input type="hidden" data-ng-model="editPres.id" data-ng-value="editPres.id">
-						</div>
-						
-						<div class="form-group">
-							<label for="name">Presentation Name</label>
-							<span class="label label-danger" data-ng-show="submitted && editPresForm.name.$error.required">Required!</span>	
-							<input type="text" data-ng-model="editPres.name" name="name" class="form-control" required/>
-						</div>
-						
-						<div class="form-group">
-							<label for="layout">Presentation data</label>
-							<span class="label label-danger" data-ng-show="submitted && editPresForm.layout.$error.required">Required!</span>	
-							<textarea data-ng-model="editPres.layout" name="layout" class="form-control" required></textarea>
-						</div>
-						
-						<div class="form-group">
-							<label for="publishType">Publish To</label>
-							<input type="radio" value="0" data-ng-model="editPres.publish" name="publishType" /> Only Signed In Users
-							<input type="radio" value="1" data-ng-model="editPres.publish" name="publishType" /> Everyone					
-						</div>
-						
-						<div class="form-group">
-							<label for="presIsTemplate">Is Template? </label>
-							<input type="checkbox" data-ng-model="editPres.isTemplate" name="presIsTemplate" />
-						</div>	          
-						
-						<button class="btn btn-primary" data-ng-click="updatePresentation(editPres,editPresForm)">Save</button>			
-					</form>
+		<!-- PRESENTATION LIST-->
+		<div class="container-fluid" data-ng-show="presentationList || presentationListRespError">
+			<div class="panel panel-default" style="margin:10px">
+				<div class="panel-heading"> Presentation List </div>
+				<div class="panel-body" data-ng-show="presentationListRespError" data-ng-bind-html="presentationListRespError"></div>
+				<div class="panel-body" data-ng-show="!presentationList.items.length" style="margin-left:30px;">No Presentations Found!</div>
+				<div class="panel-body" data-ng-show="presentationList.items.length" style="margin-left:30px;">
+					<span data-ng-repeat="p in presentationList.items">
+						<label class="radio" for="{{p.id}}">
+							<input type="radio" value="{{p.id}}" data-ng-model="pres" name="group" id="{{p.id}}" data-ng-click="isThisTemplate(false);getPresentation(p.id)"/>
+						{{p.id}} ({{p.name}})
+					</label>
+					<button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="publishPresentation(p.id)">Publish</button>
+					<button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="deletePresentation(p.id)">Delete</button>
+					<!--button class="btn btn-primary" data-ng-show="pres==p.id" data-ng-click="editPresentation(p.id)">Edit</button-->
+					</span>
 				</div>
-				</div>
+			</div>
+			<div class="panel panel-default" data-ng-show="showEditTabs==true" style="margin:10px">
+					<data-ng-include src="'mytabset.html'"></data-ng-include>
 			</div>
 		</div>
 		
+		<!-- TEMPLATE LIST-->
 		<div class="container-fluid" data-ng-show="templateList || templateListRespError">
 			<div class="panel panel-default" style="margin:10px">
 				<div class="panel-heading"> Template List </div>
@@ -128,28 +64,30 @@
 				<div class="panel-body" data-ng-show="templateList.items.length" style="margin-left:30px;">
 					<span data-ng-repeat="t in templateList.items">
 						<label class="radio" for="{{t.id}}">
-							<input type="radio" value="{{t.id}}" data-ng-model="pres" name="group" id="{{t.id}}" data-ng-click="reset();getPresentation(t.id)"/>
+							<input type="radio" value="{{t.id}}" data-ng-model="pres" name="group" id="{{t.id}}" data-ng-click="isThisTemplate(true);getPresentation(t.id)"/>
 						{{t.id}} ({{t.name}})
-					</label>
+						</label>
+					</span>
 				</div>
+					
+				
+			</div>
+			<div class="panel panel-default" data-ng-show="showTemplateTabs==true" style="margin:10px">
+					<data-ng-include src="'mytabset.html'"></data-ng-include>
 			</div>
 		</div>
 		
-		<div class="panel panel-default" data-ng-show="presentationInfo" style="position:absolute;width:100%;height:100%" >
-			<div class="panel-heading"> Presentation {{presentationId}} Info </div>
-			<div class="panel-body" data-ng-bind-html="presentationInfo | unsafe" style="position:absolute"></div>
-		</div>
-
     </div>
 	
     <script type="text/javascript" src="js/vendor/angular.js"></script>
     <script type="text/javascript" src="js/vendor/angular-resource.js"></script>
     <script type="text/javascript" src="js/vendor/angular-sanitize.js"></script>
 	<script type="text/javascript" src="js/vendor/angular-googleapi.js"></script>
+	<script type="text/javascript" src="js/vendor/ui-bootstrap-tpls-0.11.0.js"></script>
+	
 	<script type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript" src="js/controllers.js"></script>
-
-	<!--script type="text/javascript" src="ui-bootstrap-tpls-0.11.0.js"></script-->
+	
 	<script src="https://apis.google.com/js/client.js"></script>
 	</body>
 </html>

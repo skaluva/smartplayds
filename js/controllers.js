@@ -1,4 +1,4 @@
-angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
+angular.module('smartplayds')
 	.constant("API_ROOT","https://rvacore-test.appspot.com/_ah/api")
     
     .config(function(googleLoginProvider) {
@@ -15,52 +15,48 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		 }
 	 }) 
 	 
-	.controller('MainCtrl', ['$scope', 'googleLogin', /*'googlePlus',*/'API_ROOT',  function ($scope, googleLogin,/*googlePlus,*/apiRoot) {
+	.controller('MainCtrl', ['$scope', 'googleLogin', 'googlePlus','API_ROOT',  function ($scope, googleLogin,googlePlus,apiRoot) {
 
 		$scope.authenticated = false;
 		$scope.login = function () {
-			//~ console.log("5555");
 			googleLogin.login();
 		};
 		
 		$scope.$on("google:authenticated",function(res){
 			$scope.authenticated=true;
 			$scope.currentUser = googleLogin.currentUser;	
-			//console.log("11111:"+JSON.stringify(res));
-			/*$scope.$on("googlePlus:loaded", function() {
-				//~ console.log("2222");
+			$scope.$on("googlePlus:loaded", function() {
 			  googlePlus.getCurrentUser().then(function(user) {
 				$scope.currentUser = user;
 				$scope.rvaLogin();	
 			  });
-			})*/
+			})
 		});
 		
 		
 		
 		$scope.logout = function() {
-			googleLogin.logout();
-			$scope.authenticated=false;
-			alert("You are logged out successfully!");
+			if(confirm("Are you sure you want to logout?")){
+				googleLogin.logout();
+				$scope.authenticated=false;
+				$scope.currentUser=null;
+				alert("You are logged out successfully!");	
+			};
 		}
 		
 		$scope.rvaLogin=function(){
-					//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
-					gapi.client.load('core', 'v0', function() {
-					var request = gapi.client.core.user.get({
-						//'username': 'sreenivasulu.kaluva@gmail.com'
-						  });
-						  
-						 request.execute(function(resp) {
+			gapi.client.load('core', 'v0', function() {
+			var request = gapi.client.core.user.get({
+				//'username': 'sreenivasulu.kaluva@gmail.com'
+				  });
+				  
+				 request.execute(function(resp) {
 
-							$scope.userDetails="<pre>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
-							$scope.currentUser.companyId=resp.result.item.companyId;
-							$scope.$apply();
-						 });
-					},apiRoot);
-				//}
-				
-				//postLogin();//validate login and invoke rva api..
+					$scope.userDetails="<pre>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
+					$scope.currentUser.companyId=resp.result.item.companyId;
+					$scope.$apply();
+				 });
+			},apiRoot);
 		}
 		
 		$scope.listUsers=function(){
@@ -68,7 +64,6 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				alert("Please login!");
 				return;
 			}
-			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.user.list({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -82,8 +77,6 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		}
 		
 		$scope.getPresentation=function(presentationId){
-			//$scope.showEditPresForm=false;
-			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.get({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -91,9 +84,18 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				  });
 				  
 				 request.execute(function(resp) {
-					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
+					 
+					//$scope.presentationInfo=resp.error!=null?"<pre>"+JSON.stringify(resp.error,null,2)+"</pre>":resp.item.layout;
+					if(resp.error==null){
+						$scope.presentationInfo=resp.item.layout;
+						$scope.myPres=resp.item;
+						//$scope.abc=resp.item;//{"id":1,"name":"aaaaaaaaaaaa"};	 
+					 }else{
+						 $scope.presentationInfo="<pre>"+JSON.stringify(resp.error,null,2)+"</pre>";
+						 $scope.myPres={};
+						 
+					 }
 					
-					$scope.presentationInfo=resp.error!=null?"<pre>"+JSON.stringify(resp.error,null,2)+"</pre>":resp.item.layout;
 					$scope.$apply();
 				 });
 			  },apiRoot);				
@@ -104,22 +106,18 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				alert("Please login!");
 				return;
 			}
-			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.list({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
 				  });
 				  
 				 request.execute(function(resp) {
-					//$scope.presentationList="<pre>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
 					if(resp.error!=null){
 						$scope.presentationListRespError="<pre>"+JSON.stringify(resp.error,null,2)+"</pre>";
 					}else{
 						$scope.presentationListRespError=null;
 						$scope.presentationList=resp.result;	
 					}
-					
-					
 					$scope.$apply();
 				 });
 			  },apiRoot);				
@@ -127,7 +125,6 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		}	
 		
 		$scope.publishPresentation=function(presentationId){
-			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.publish({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -135,8 +132,6 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				  });
 				  
 				 request.execute(function(resp) {
-					
-					
 					$scope.resp="<pre>***PUBLISH "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
 					$scope.$apply();
 				 });
@@ -144,7 +139,9 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		}
 		
 		$scope.deletePresentation=function(presentationId){
-			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			if(!confirm("Are you sure you want to delete?")){
+				return;
+			}
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.delete({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
@@ -152,18 +149,18 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				  });
 				  
 				 request.execute(function(resp) {
-					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
-					
 					if(resp.error!=null){
 						alert("Error occurred, Try Again!");
 						$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
-						$scope.$apply();
+						//$scope.$apply();
 					}else{
-						$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
+						/*$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
 						$scope.$apply(function(){
 							alert("Presentation "+presentationId+" deleted successfully!");	
 							$scope.listPresentations();		
-						});
+						});*/
+						alert("Presentation "+presentationId+" deleted successfully!");	
+						$scope.listPresentations();		
 					}
 					
 					
@@ -172,20 +169,15 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 		}
 		
 		
-	/*{
-			name: "test presentation one",
-			publish: 0,
-			layout: "hello..this is simple text..",
-			isTemplate: false
-		}*/	
-		
 		$scope.showNewPresentationForm=function(){
 			if(!$scope.authenticated){
 				alert("Please login!");
 				return;
 			}
-			
+			$scope.myPres={"publish":0,"isTemplate":false};//default values...
 			$scope.showNewPresForm=true;
+			$scope.showEditTabs=false;
+			$scope.showTemplateTabs=false;	
 		}
 		
 		$scope.createPresentation=function(pres,presForm){
@@ -199,14 +191,13 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 			
 			var data={
 				"name": pres.name,
-				"publish": pres.publishTo,
+				"publish": pres.publish,
 				"layout":pres.layout,
 				"isTemplate":pres.isTemplate
 			}
 			
 			
-			alert("companyId: "+$scope.currentUser.companyId);
-			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
+			//alert("companyId: "+$scope.currentUser.companyId);
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.add({
 					companyId:$scope.currentUser.companyId,
@@ -214,8 +205,6 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				  });
 				  
 				 request.execute(function(resp) {
-					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
-					
 					if(resp.error!=null){
 						alert("Error occurred, Try Again!");
 						$scope.createResp="<pre>***CREATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
@@ -224,31 +213,8 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 						$scope.createResp="<pre>***CREATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
 						$scope.$apply(function(){
 							alert("Presentation "+pres.name+" added successfully!");	
-							//$scope.listPresentations();		
 						});
 					}
-					
-				 });
-			  },apiRoot);				
-		}
-		
-		$scope.editPresentation=function(presId){
-			
-			$scope.showEditPresForm=true;
-			
-			//alert("companyId: "+$scope.currentUser.companyId);
-			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
-			gapi.client.load('core', 'v0', function() {
-			  var request = gapi.client.core.presentation.get({
-					id:presId,
-					//data: JSON.stringify(data)
-				  });
-				  
-				 request.execute(function(resp) {
-					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
-					
-					$scope.editPres=resp.item;
-					$scope.$apply();
 					
 				 });
 			  },apiRoot);				
@@ -271,8 +237,6 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 			}
 			
 			
-			//alert("companyId: "+$scope.currentUser.companyId);
-			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.update({
 					id:pres.id,
@@ -280,7 +244,6 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 				  });
 				  
 				 request.execute(function(resp) {
-					//$scope.presentationInfo="<pre>"+(resp.error!=null?JSON.stringify(resp.error,null,2):resp.item.layout)+"</pre>";
 					
 					if(resp.error!=null){
 						alert("Error occurred, Try Again!");
@@ -289,8 +252,8 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 					}else{
 						$scope.updateResp="<pre>***UPDATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
 						$scope.$apply(function(){
-							alert("Presentation "+pres.name+" updated successfully!");	
-							//$scope.listPresentations();		
+							alert("Presentation "+pres.name+" updated successfully!");
+							$scope.listPresentations();	
 						});
 					}
 					
@@ -298,23 +261,30 @@ angular.module('smartplayds', ["googleApi","ngResource","ngSanitize"])
 			  },apiRoot);				
 		}
 		
-		$scope.reset = function() {
-			if($scope.showEditPresForm){
-				$scope.showEditPresForm=false;
-				$scope.editPres = {};	
+		
+		$scope.isThisTemplate = function(isTemplate) {
+			$scope.fromTemplate=isTemplate;
+			$scope.showNewPresForm=false;
+			if(isTemplate){
+				$scope.showTemplateTabs=true;
+				$scope.showEditTabs=false;	
+			}else{
+				$scope.showEditTabs=true;
+				$scope.showTemplateTabs=false;		
 			}
+			$scope.myPres = {};
 		}
-
-
+		
 		$scope.listTemplates=function(presentationId){
 			if(!$scope.authenticated){
 				alert("Please login!");
 				return;
 			}
-			//var apiRoot='https://rvacore-test.appspot.com/_ah/api';
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.template.list({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
+					//companyId:$scope.currentUser.companyId
+					'search':'companyId:'+ $scope.currentUser.companyId
 				  });
 				  
 				 request.execute(function(resp) {
