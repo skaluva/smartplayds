@@ -75,7 +75,8 @@ angular.module('smartplayds')
 				 });
 			  },apiRoot);
 		}
-		
+
+		//GET PRESENTATION		
 		$scope.getPresentation=function(presentationId){
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.get({
@@ -85,22 +86,19 @@ angular.module('smartplayds')
 				  
 				 request.execute(function(resp) {
 					 
-					//$scope.presentationInfo=resp.error!=null?"<pre>"+JSON.stringify(resp.error,null,2)+"</pre>":resp.item.layout;
 					if(resp.error==null){
 						$scope.presentationInfo=resp.item.layout;
 						$scope.myPres=resp.item;
-						//$scope.abc=resp.item;//{"id":1,"name":"aaaaaaaaaaaa"};	 
 					 }else{
 						 $scope.presentationInfo="<pre>"+JSON.stringify(resp.error,null,2)+"</pre>";
 						 $scope.myPres={};
-						 
 					 }
 					
 					$scope.$apply();
 				 });
 			  },apiRoot);				
 		}
-		
+		//LIST PRESENTATIONS
 		$scope.listPresentations=function(presentationId){
 			if(!$scope.authenticated){
 				alert("Please login!");
@@ -124,6 +122,7 @@ angular.module('smartplayds')
 				
 		}	
 		
+		//PUBLISH PRESENTATION
 		$scope.publishPresentation=function(presentationId){
 			gapi.client.load('core', 'v0', function() {
 			  var request = gapi.client.core.presentation.publish({
@@ -133,11 +132,17 @@ angular.module('smartplayds')
 				  
 				 request.execute(function(resp) {
 					$scope.resp="<pre>***PUBLISH "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
+					if(resp.error!=null){
+						alert("Error occurred. Please try again! <br>"+JSON.stringify(resp.error,null,2));
+					}else{
+						alert(presentationId+" published successfully!");
+					}
 					$scope.$apply();
 				 });
 			  },apiRoot);				
 		}
 		
+		//DELETE PRESENTATION
 		$scope.deletePresentation=function(presentationId){
 			if(!confirm("Are you sure you want to delete?")){
 				return;
@@ -150,8 +155,8 @@ angular.module('smartplayds')
 				  
 				 request.execute(function(resp) {
 					if(resp.error!=null){
-						alert("Error occurred, Try Again!");
-						$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
+						alert("Error occurred. Please try again! <br>"+JSON.stringify(resp.error,null,2));
+						//$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
 						//$scope.$apply();
 					}else{
 						/*$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
@@ -160,6 +165,7 @@ angular.module('smartplayds')
 							$scope.listPresentations();		
 						});*/
 						alert("Presentation "+presentationId+" deleted successfully!");	
+						$scope.showPresTabs=false;
 						$scope.listPresentations();		
 					}
 					
@@ -176,10 +182,11 @@ angular.module('smartplayds')
 			}
 			$scope.myPres={"publish":0,"isTemplate":false};//default values...
 			$scope.showNewPresForm=true;
-			$scope.showEditTabs=false;
+			$scope.showPresTabs=false;
 			$scope.showTemplateTabs=false;	
 		}
 		
+		//CREATE PRESENTATION
 		$scope.createPresentation=function(pres,presForm){
 			
 			
@@ -206,20 +213,23 @@ angular.module('smartplayds')
 				  
 				 request.execute(function(resp) {
 					if(resp.error!=null){
-						alert("Error occurred, Try Again!");
-						$scope.createResp="<pre>***CREATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
-						$scope.$apply();
+						alert("Error occurred. Please try again! <br>"+JSON.stringify(resp.error,null,2));
+						//$scope.createResp="<pre>***CREATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
+						//$scope.$apply();
 					}else{
-						$scope.createResp="<pre>***CREATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
-						$scope.$apply(function(){
+						//$scope.createResp="<pre>***CREATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
+						/*$scope.$apply(function(){
 							alert("Presentation "+pres.name+" added successfully!");	
-						});
+						});*/
+						
+						alert("Presentation "+pres.name+" created successfully!");	
 					}
 					
 				 });
 			  },apiRoot);				
 		}
 		
+		// UPDATE PRESENTATION
 		$scope.updatePresentation=function(pres,presForm){
 			
 			
@@ -246,15 +256,20 @@ angular.module('smartplayds')
 				 request.execute(function(resp) {
 					
 					if(resp.error!=null){
-						alert("Error occurred, Try Again!");
-						$scope.updateResp="<pre>***UPDATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
-						$scope.$apply();
+						alert("Error occurred. Please try again! <br>"+JSON.stringify(resp.error,null,2));
+						//$scope.updateResp="<pre>***UPDATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
+						//$scope.$apply();
 					}else{
-						$scope.updateResp="<pre>***UPDATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
+						/*$scope.updateResp="<pre>***UPDATE "+pres.name+" RESPONSE***<br>"+JSON.stringify(resp.result,null,2)+"</pre>";
 						$scope.$apply(function(){
 							alert("Presentation "+pres.name+" updated successfully!");
-							$scope.listPresentations();	
+							$scope.showPresTabs=false;	
+							$scope.listPresentations();
 						});
+						*/
+						alert("Presentation "+pres.name+" updated successfully!");
+						$scope.showPresTabs=false;	
+						$scope.listPresentations();
 					}
 					
 				 });
@@ -267,9 +282,9 @@ angular.module('smartplayds')
 			$scope.showNewPresForm=false;
 			if(isTemplate){
 				$scope.showTemplateTabs=true;
-				$scope.showEditTabs=false;	
+				$scope.showPresTabs=false;	
 			}else{
-				$scope.showEditTabs=true;
+				$scope.showPresTabs=true;
 				$scope.showTemplateTabs=false;		
 			}
 			$scope.myPres = {};
