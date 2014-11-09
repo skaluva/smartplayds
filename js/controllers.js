@@ -94,7 +94,7 @@ angular.module('smartplayds')
 					if(resp.error==null){
 						$scope.presentationInfo=resp.item.layout;
 						$scope.myPres=resp.item;
-						$scope.myPresPreviewURL="http://viewer-test.appspot.com/Viewer.html?type=presentation&id="+presentationId;
+						$scope.myPresPreviewURL="https://viewer-test.appspot.com/Viewer.html?type=presentation&id="+presentationId;
 					 }else{
 						 $scope.presentationInfo="<pre>"+JSON.stringify(resp.error,null,2)+"</pre>";
 						 $scope.myPres={};
