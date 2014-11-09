@@ -14,6 +14,11 @@ angular.module('smartplayds')
 			 return $sce.trustAsHtml(val);
 		 }
 	 }) 
+	 .filter("trustedURL",function($sce){
+		 return function(val){
+			 return $sce.trustAsResourceUrl(val);
+		 }
+	 }) 
 	 
 	.controller('MainCtrl', ['$scope', 'googleLogin', 'googlePlus','API_ROOT',  function ($scope, googleLogin,googlePlus,apiRoot) {
 
@@ -89,6 +94,7 @@ angular.module('smartplayds')
 					if(resp.error==null){
 						$scope.presentationInfo=resp.item.layout;
 						$scope.myPres=resp.item;
+						$scope.myPresPreviewURL="http://viewer-test.appspot.com/Viewer.html?type=presentation&id="+presentationId;
 					 }else{
 						 $scope.presentationInfo="<pre>"+JSON.stringify(resp.error,null,2)+"</pre>";
 						 $scope.myPres={};
