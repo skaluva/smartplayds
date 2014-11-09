@@ -1,0 +1,9 @@
+<tabset>
+    <tab heading="Preview">
+		<div data-ng-bind-html="presentationInfo | unsafe"> </div>
+		<iframe ng-src="{{myPresPreviewURL | trustedURL}}" width="100%" height="1000px"> </iframe>
+	</tab>
+	<tab heading="Edit" >
+		<div data-ng-include src="'presentationForm.html'"></div>
+	</tab>
+ </tabset>
