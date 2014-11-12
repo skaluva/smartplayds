@@ -104,7 +104,7 @@ angular.module('smartplayds')
 							var content=doc.scripts[0].text;
 							var pJsonStr=content.substring(content.indexOf("= ")+2,content.lastIndexOf("};")+1);
 							//console.log("***script tag content:: "+content);	
-							console.log("***p json:: "+pJsonStr);
+							console.log("***script tag content: "+pJsonStr);
 							var pJsonObj=JSON.parse(pJsonStr);
 							var placeholdersArr=pJsonObj.presentationData.placeholders;
 							var textItems=[];
