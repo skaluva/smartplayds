@@ -92,9 +92,45 @@ angular.module('smartplayds')
 				 request.execute(function(resp) {
 					 
 					if(resp.error==null){
-						$scope.presentationInfo=resp.item.layout;
 						$scope.myPres=resp.item;
 						$scope.myPresPreviewURL="https://viewer-test.appspot.com/Viewer.html?type=presentation&id="+presentationId;
+						
+						
+						$scope.presentationInfo=resp.item.layout;
+						//console.log("layout: "+JSON.parse(resp.item.layout));
+						var parser= new DOMParser();
+						var doc=parser.parseFromString(resp.item.layout,"text/html");
+						if(doc.scripts.length>=1){
+							var content=doc.scripts[0].text;
+							var pJsonStr=content.substring(content.indexOf("= ")+2,content.lastIndexOf("};")+1);
+							//console.log("***script tag content:: "+content);	
+							console.log("***p json:: "+pJsonStr);
+							var pJsonObj=JSON.parse(pJsonStr);
+							var placeholdersArr=pJsonObj.presentationData.placeholders;
+							var textItems=[];
+							var imageItems=[];
+								
+							for(var i=0;i<placeholdersArr.length;i++){
+								var ph=placeholdersArr[i];
+								var items=ph.items;
+								for(var j=0;j<items.length;j++){
+									var item=items[j];
+									if(item.type=="text"){
+											textItems.push(ph.id+"--->"+item.objectData);
+										}else if(item.type=="image"){
+											imageItems.push(ph.id+"--->"+item.objectData);
+										}
+									}
+							}	
+							
+							console.log("***text items:: "+textItems);
+							console.log("***image items:: "+imageItems);
+						}else{
+							content=doc.body.innerHTML;
+							console.log("***script tag content:: "+content);	
+						}
+						
+						
 					 }else{
 						 $scope.presentationInfo="<pre>"+JSON.stringify(resp.error,null,2)+"</pre>";
 						 $scope.myPres={};
