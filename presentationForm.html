@@ -13,11 +13,16 @@
 			<input type="text" data-ng-model="myPres.name" name="name" class="form-control" required/>
 		</div>
 		
-		<div class="form-group">
-			<label for="layout">Presentation data</label>
-			<span class="label label-danger" data-ng-show="submitted && myPresForm.layout.$error.required">Required!</span>	
-			<textarea data-ng-model="myPres.layout" name="layout" class="form-control" required></textarea>
-		</div>
+		<label class="text"><u>List of Images</u></label>  
+			<div class="form-group" data-ng-repeat="img in myPres.imageItems" data-ng-show="myPres.imageItems">
+				<label class="text" for="{{img.phId}}">placeholder({{img.phId}}) image({{img.itemIndex+1}})</label>
+				<input type="text" data-ng-model="img.data" name="imgData" id="{{img.phId}}_{{img.itemIndex}}" style="width:50%" />
+				<span class="error" data-ng-show="myPresForm.imgData.$error.required">Required!</span>
+				<span class="error" data-ng-show="myPresForm.imgData.$error.url">Not valid url!</span>
+			</div>
+			<div class="form-group" data-ng-show="!myPres.imageItems">
+				No Images Found!
+			</div>
 		
 		<div class="form-group">
 			<label for="publishType">Publish To</label>

@@ -18,7 +18,16 @@ angular.module('smartplayds')
 		 return function(val){
 			 return $sce.trustAsResourceUrl(val);
 		 }
-	 }) 
+	 })
+	 .filter('encodeUri', function ($window) {
+			return $window.encodeURIComponent;
+	  })
+	  .filter('decodeUri', function ($window) {
+			return function(val){
+				return $window.decodeURIComponent(val);
+			}
+			//return 
+	  })
 	 
 	.controller('MainCtrl', ['$scope', 'googleLogin', 'googlePlus','API_ROOT',  function ($scope, googleLogin,googlePlus,apiRoot) {
 
@@ -100,6 +109,9 @@ angular.module('smartplayds')
 						//console.log("layout: "+JSON.parse(resp.item.layout));
 						var parser= new DOMParser();
 						var doc=parser.parseFromString(resp.item.layout,"text/html");
+						
+						$scope.presentationDoc=doc;
+						
 						if(doc.scripts.length>=1){
 							var content=doc.scripts[0].text;
 							var pJsonStr=content.substring(content.indexOf("= ")+2,content.lastIndexOf("};")+1);
@@ -109,25 +121,40 @@ angular.module('smartplayds')
 							var placeholdersArr=pJsonObj.presentationData.placeholders;
 							var textItems=[];
 							var imageItems=[];
-								
+							
+							var myTexItem={};
+							var myImageItem={};	
 							for(var i=0;i<placeholdersArr.length;i++){
 								var ph=placeholdersArr[i];
 								var items=ph.items;
+								textItems.push(ph.id,{});
 								for(var j=0;j<items.length;j++){
 									var item=items[j];
 									if(item.type=="text"){
-											textItems.push(ph.id+"--->"+item.objectData);
+											textItems.push(ph.id+"<--->"+item.objectData);
 										}else if(item.type=="image"){
-											imageItems.push(ph.id+"--->"+item.objectData);
+											var myImageItem={};	
+											myImageItem["phId"]=ph.id;
+											myImageItem["itemIndex"]=j;
+											myImageItem["data"]=decodeURIComponent(item.objectData.substring(item.objectData.indexOf("=")+1,item.objectData.indexOf("&")));
+											
+											imageItems.push(myImageItem);
+											//http://commondatastorage.googleapis.com/risemedialibrary-6c41247e-04bc-4b41-81de-7a065e4d970c/icon-home-off.png
+											//http://commondatastorage.googleapis.com/risemedialibrary-6c41247e-04bc-4b41-81de-7a065e4d970c/icon-news-off.png
 										}
 									}
 							}	
 							
 							console.log("***text items:: "+textItems);
 							console.log("***image items:: "+imageItems);
+							
+							$scope.myPres.textItems=textItems;
+							$scope.myPres.imageItems=imageItems;
+							
 						}else{
 							content=doc.body.innerHTML;
 							console.log("***script tag content:: "+content);	
+							$scope.presentationInfo=content;
 						}
 						
 						
@@ -280,11 +307,49 @@ angular.module('smartplayds')
 				return;
 			}
 			
+			var doc=$scope.presentationDoc;
+						
+			if(doc.scripts.length>=1){
+				var content=doc.scripts[0].text;
+				var pJsonStr=content.substring(content.indexOf("= ")+2,content.lastIndexOf("};")+1);
+				//console.log("***script tag content:: "+content);	
+				console.log("***script tag content: "+pJsonStr);
+				var pJsonObj=JSON.parse(pJsonStr);
+				var placeholdersArr=pJsonObj.presentationData.placeholders;
+				
+				for(var i=0;i<pres.imageItems.length;i++){
+					var formImageItem=pres.imageItems[i];
+					
+					for(var j=0;j<placeholdersArr.length;j++){
+						var ph=placeholdersArr[j];
+						if(ph.id==formImageItem.phId){
+							var upImageItem=ph.items[formImageItem.itemIndex];
+
+							var encGivenURL=encodeURIComponent(formImageItem.data);
+
+							var encHttpURL=upImageItem.objectData.substring(upImageItem.objectData.indexOf("=")+1,upImageItem.objectData.indexOf("&"));
+
+							upImageItem.objectData=upImageItem.objectData.replace(encHttpURL,encGivenURL);
+
+							console.log(upImageItem);
+							break;	
+						}
+					}
+				}
+				
+				console.log(pJsonObj);
+				
+				content=content.replace(pJsonStr,JSON.stringify(pJsonObj,null,2));
+				doc.scripts[0].text=content;
+			}
+			
+			var layout="<!DOCTYPE HTML><html>"+doc.documentElement.innerHTML+"</html>";
+			
 			
 			var data={
 				"name": pres.name,
 				"publish": pres.publish,
-				"layout":pres.layout,
+				"layout":layout,
 				"isTemplate":pres.isTemplate
 			}
 			
