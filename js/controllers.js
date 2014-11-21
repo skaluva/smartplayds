@@ -121,9 +121,13 @@ angular.module('smartplayds')
 							var placeholdersArr=pJsonObj.presentationData.placeholders;
 							var textItems=[];
 							var imageItems=[];
+							/*
+							"<font face="Open Sans">
+
+<span id="BoxText1_text1">Cura del Viso</span></font><div><font face="Open Sans"><span><br></span></font></div><div><font face="Open Sans" color="#0b5394"><span style="background-color: rgb(0, 255, 255);"><b><span id="BoxText1_text2">Helloooooooo i'm here to develop!</span></b></span></font></div>"
+							 */
 							
-							var myTexItem={};
-							var myImageItem={};	
+							
 							for(var i=0;i<placeholdersArr.length;i++){
 								var ph=placeholdersArr[i];
 								var items=ph.items;
@@ -131,7 +135,22 @@ angular.module('smartplayds')
 								for(var j=0;j<items.length;j++){
 									var item=items[j];
 									if(item.type=="text"){
-											textItems.push(ph.id+"<--->"+item.objectData);
+											//textItems.push(ph.id+"<--->"+item.objectData);
+											
+											var dataDoc=parser.parseFromString(item.objectData,"text/html");;
+											var spansArr=dataDoc.getElementsByTagName("span");
+											for(var k=0;k<spansArr.length;k++){
+												var currentSpan=spansArr[k];
+												if(currentSpan.id.startsWith(ph.id)){
+														var myTexItem={};
+														myTexItem["phId"]=ph.id;
+														myTexItem["itemIndex"]=j;
+														myTexItem["txtItemId"]=currentSpan.id;
+														myTexItem["data"]=currentSpan.innerHTML;		
+														textItems.push(myTexItem);
+												}
+											}	
+											
 										}else if(item.type=="image"){
 											var myImageItem={};	
 											myImageItem["phId"]=ph.id;
@@ -153,7 +172,7 @@ angular.module('smartplayds')
 							
 						}else{
 							content=doc.body.innerHTML;
-							console.log("***script tag content:: "+content);	
+							//console.log("***script tag content:: "+content);	
 							$scope.presentationInfo=content;
 						}
 						
@@ -222,7 +241,7 @@ angular.module('smartplayds')
 					id:presentationId
 				  });
 				  
-				 request.execute(function(resp) {
+				 request.execute(function(resp) { 
 					if(resp.error!=null){
 						alert("Error occurred. Please try again! <br>"+JSON.stringify(resp.error,null,2));
 						//$scope.resp="<pre>***DELETE "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";	
@@ -349,7 +368,7 @@ angular.module('smartplayds')
 			var data={
 				"name": pres.name,
 				"publish": pres.publish,
-				"layout":layout,
+				"layout":pres.layout,
 				"isTemplate":pres.isTemplate
 			}
 			

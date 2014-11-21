@@ -25,6 +25,12 @@
 			</div>
 		
 		<div class="form-group">
+			<label for="layout">Presentation data</label>
+			<span class="label label-danger" data-ng-show="submitted && myPresForm.layout.$error.required">Required!</span>	
+			<textarea data-ng-model="myPres.layout" name="layout" class="form-control" required></textarea>
+		</div>
+		
+		<div class="form-group">
 			<label for="publishType">Publish To</label>
 			<input type="radio" value="0" data-ng-model="myPres.publish" name="publishType"/> Only Signed In Users
 			<input type="radio" value="1" data-ng-model="myPres.publish" name="publishType" /> Everyone					
