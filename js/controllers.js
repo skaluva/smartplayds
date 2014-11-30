@@ -1,6 +1,7 @@
 angular.module('smartplayds')
 	.constant("API_ROOT","https://rvacore-test.appspot.com/_ah/api")
-    
+    .constant("API_NAME","core")
+    .constant("API_VER","v1")
     .config(function(googleLoginProvider) {
         googleLoginProvider.configure({
             clientId: '444838946066-s4p6e92h5pvnifbt4q1itahv0c65fjeu.apps.googleusercontent.com',
@@ -29,7 +30,7 @@ angular.module('smartplayds')
 			//return 
 	  })
 	 
-	.controller('MainCtrl', ['$scope', 'googleLogin', 'googlePlus','API_ROOT',  function ($scope, googleLogin,googlePlus,apiRoot) {
+	.controller('MainCtrl', ['$scope', 'googleLogin', 'googlePlus','API_ROOT','API_NAME','API_VER',  function ($scope, googleLogin,googlePlus,API_ROOT,API_NAME,API_VER) {
 
 		$scope.authenticated = false;
 		$scope.login = function () {
@@ -59,7 +60,7 @@ angular.module('smartplayds')
 		}
 		
 		$scope.rvaLogin=function(){
-			gapi.client.load('core', 'v0', function() {
+			gapi.client.load(API_NAME, API_VER, function() {
 			var request = gapi.client.core.user.get({
 				//'username': 'sreenivasulu.kaluva@gmail.com'
 				  });
@@ -70,7 +71,7 @@ angular.module('smartplayds')
 					$scope.currentUser.companyId=resp.result.item.companyId;
 					$scope.$apply();
 				 });
-			},apiRoot);
+			},API_ROOT);
 		}
 		
 		$scope.listUsers=function(){
@@ -78,7 +79,7 @@ angular.module('smartplayds')
 				alert("Please login!");
 				return;
 			}
-			gapi.client.load('core', 'v0', function() {
+			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.user.list({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
 				  });
@@ -87,12 +88,12 @@ angular.module('smartplayds')
 					$scope.userList="<pre>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
 					$scope.$apply();
 				 });
-			  },apiRoot);
+			  },API_ROOT);
 		}
 
 		//GET PRESENTATION		
 		$scope.getPresentation=function(presentationId){
-			gapi.client.load('core', 'v0', function() {
+			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.presentation.get({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
 					id:presentationId
@@ -141,7 +142,7 @@ angular.module('smartplayds')
 											var spansArr=dataDoc.getElementsByTagName("span");
 											for(var k=0;k<spansArr.length;k++){
 												var currentSpan=spansArr[k];
-												if(currentSpan.id.startsWith(ph.id)){
+												if(currentSpan!=null && currentSpan.id.indexOf(ph.id)==0){
 														var myTexItem={};
 														myTexItem["phId"]=ph.id;
 														myTexItem["itemIndex"]=j;
@@ -184,7 +185,7 @@ angular.module('smartplayds')
 					
 					$scope.$apply();
 				 });
-			  },apiRoot);				
+			  },API_ROOT);				
 		}
 		//LIST PRESENTATIONS
 		$scope.listPresentations=function(presentationId){
@@ -192,7 +193,7 @@ angular.module('smartplayds')
 				alert("Please login!");
 				return;
 			}
-			gapi.client.load('core', 'v0', function() {
+			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.presentation.list({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
 				  });
@@ -206,13 +207,13 @@ angular.module('smartplayds')
 					}
 					$scope.$apply();
 				 });
-			  },apiRoot);				
+			  },API_ROOT);				
 				
 		}	
 		
 		//PUBLISH PRESENTATION
 		$scope.publishPresentation=function(presentationId){
-			gapi.client.load('core', 'v0', function() {
+			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.presentation.publish({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
 					id:presentationId
@@ -227,7 +228,7 @@ angular.module('smartplayds')
 					}
 					$scope.$apply();
 				 });
-			  },apiRoot);				
+			  },API_ROOT);				
 		}
 		
 		//DELETE PRESENTATION
@@ -235,7 +236,7 @@ angular.module('smartplayds')
 			if(!confirm("Are you sure you want to delete?")){
 				return;
 			}
-			gapi.client.load('core', 'v0', function() {
+			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.presentation.delete({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
 					id:presentationId
@@ -255,11 +256,12 @@ angular.module('smartplayds')
 						alert("Presentation "+presentationId+" deleted successfully!");	
 						$scope.showPresTabs=false;
 						$scope.listPresentations();		
+
 					}
 					
 					
 				 });
-			  },apiRoot);				
+			  },API_ROOT);				
 		}
 		
 		
@@ -293,7 +295,7 @@ angular.module('smartplayds')
 			
 			
 			//alert("companyId: "+$scope.currentUser.companyId);
-			gapi.client.load('core', 'v0', function() {
+			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.presentation.add({
 					companyId:$scope.currentUser.companyId,
 					data: JSON.stringify(data)
@@ -314,7 +316,7 @@ angular.module('smartplayds')
 					}
 					
 				 });
-			  },apiRoot);				
+			  },API_ROOT);				
 		}
 		
 		// UPDATE PRESENTATION
@@ -365,19 +367,30 @@ angular.module('smartplayds')
 			var layout="<!DOCTYPE HTML><html>"+doc.documentElement.innerHTML+"</html>";
 			
 			
-			var data={
-				"name": pres.name,
-				"publish": pres.publish,
-				"layout":pres.layout,
-				"isTemplate":pres.isTemplate
+			var _data={
+				//"name": pres.name,
+				//"publish": pres.publish,
+				"layout":JSON.stringify(pres.layout),
+				//"isTemplate":pres.isTemplate
 			}
+
+			var params={};
+
+			// if (_data) {
+        		params['data'] = JSON.parse(_data);
+		    // }
+		    // if (_id) {
+		        params['id'] = pres.id;
+		    // }
+		    /*if (_fields) {
+		        parameters['fields'] = _fields;
+		    }*/
 			
-			
-			gapi.client.load('core', 'v0', function() {
-			  var request = gapi.client.core.presentation.update({
-					id:pres.id,
-					data: JSON.stringify(data)
-				  });
+//http://commondatastorage.googleapis.com/risemedialibrary-6c41247e-04bc-4b41-81de-7a065e4d970c/icon-event-off.png
+//http://commondatastorage.googleapis.com/risemedialibrary-6c41247e-04bc-4b41-81de-7a065e4d970c/icon-service-off.png
+
+			gapi.client.load(API_NAME, API_VER, function() {
+			  var request = gapi.client.core.presentation.patch(params);
 				  
 				 request.execute(function(resp) {
 					
@@ -399,7 +412,7 @@ angular.module('smartplayds')
 					}
 					
 				 });
-			  },apiRoot);				
+			  },API_ROOT);				
 		}
 		
 		
@@ -421,7 +434,7 @@ angular.module('smartplayds')
 				alert("Please login!");
 				return;
 			}
-			gapi.client.load('core', 'v0', function() {
+			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.template.list({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
 					//companyId:$scope.currentUser.companyId
@@ -437,6 +450,6 @@ angular.module('smartplayds')
 					}
 					$scope.$apply();
 				 });
-			  },apiRoot);				
+			  },API_ROOT);				
 		}		
 	}]);
