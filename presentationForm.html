@@ -3,32 +3,44 @@
 			
 	<form novalidate role="form" class="simple-form" name="myPresForm">
 		<div class="form-group" data-ng-hide="fromTemplate || showNewPresForm">
-			<label>Presentation ID : </label>{{myPres.id}}
+			<label>Presentation ID : </label> {{myPres.id}}
 			<input type="hidden" data-ng-model="myPres.id" data-ng-value="myPres.id">
 		</div>
 		
 		<div class="form-group">
-			<label for="name">Presentation Name</label>
-			<span class="label label-danger" data-ng-show="submitted && myPresForm.name.$error.required">Required!</span>	
-			<input type="text" data-ng-model="myPres.name" name="name" class="form-control" required/>
+			<label for="name">Presentation Name : </label> {{myPres.name}}
+			<input type="hidden" data-ng-model="myPres.name" data-ng-value="myPres.name">
+			<!--span class="label label-danger" data-ng-show="submitted && myPresForm.name.$error.required">Required!</span>	
+			<input type="text" data-ng-model="myPres.name" name="name" class="form-control" required/-->
 		</div>
 		
 		<label class="text"><u>List of Images</u></label>  
-			<div class="form-group" data-ng-repeat="img in myPres.imageItems" data-ng-show="myPres.imageItems">
-				<label class="text" for="{{img.phId}}">placeholder({{img.phId}}) image({{img.itemIndex+1}})</label>
-				<input type="text" data-ng-model="img.data" name="imgData" id="{{img.phId}}_{{img.itemIndex}}" style="width:50%" />
-				<span class="error" data-ng-show="myPresForm.imgData.$error.required">Required!</span>
-				<span class="error" data-ng-show="myPresForm.imgData.$error.url">Not valid url!</span>
-			</div>
-			<div class="form-group" data-ng-show="!myPres.imageItems">
-				No Images Found!
-			</div>
+		<div class="form-group" data-ng-repeat="img in myPres.imageItems" data-ng-show="myPres.imageItems">
+			<label class="text" for="{{img.phId}}">placeholder({{img.phId}}) image({{img.itemIndex+1}})</label>
+			<input type="text" data-ng-model="img.data" name="imgData" id="{{img.phId}}_{{img.itemIndex}}" style="width:50%" />
+			<span class="error" data-ng-show="myPresForm.imgData.$error.required">Required!</span>
+			<span class="error" data-ng-show="myPresForm.imgData.$error.url">Not valid url!</span>
+		</div>
+		<div class="form-group" data-ng-show="!myPres.imageItems">
+			No Images Found!
+		</div>
+
+		<!--
+		<label class="text"><u>List of Text Items</u></label>  
+		<div class="form-group" data-ng-repeat="txt in myPres.textItems" data-ng-show="myPres.textItems">
+			<label class="text" for="{{txt.txtItemId}}">placeholder({{txt.phId}}) text({{txt.txtItemId}})</label>
+			<input type="text" data-ng-model="txt.data" name="txtData" id="{{txt.txtItemId}}" style="width:50%" />
+			<span class="error" data-ng-show="myPresForm.txtData.$error.required">Required!</span>
+		</div>
+		<div class="form-group" data-ng-show="!myPres.textItems">
+			No Text Items Found!
+		</div>-->
 		
-		<div class="form-group">
+		<!--div class="form-group">
 			<label for="layout">Presentation data</label>
 			<span class="label label-danger" data-ng-show="submitted && myPresForm.layout.$error.required">Required!</span>	
 			<textarea data-ng-model="myPres.layout" name="layout" class="form-control" required></textarea>
-		</div>
+		</div-->
 		
 		<div class="form-group">
 			<label for="publishType">Publish To</label>
@@ -43,5 +55,7 @@
 		
 		<button class="btn btn-primary" data-ng-hide="fromTemplate || showNewPresForm"  data-ng-click="updatePresentation(myPres,myPresForm)">Save</button>
 		<button class="btn btn-primary" data-ng-show="fromTemplate || showNewPresForm" data-ng-click="createPresentation(myPres,myPresForm)">Create</button>
-	</form>
-</div>
+		<button class="btn btn-primary" data-ng-click="txtation(myPres)">txtlish</button>
+		<button class="btntxt-primary" data-ng-click="deletePresentation(txtData)">Delete</button>
+txtData
+text/Text Itemsv>

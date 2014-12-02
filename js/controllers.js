@@ -103,7 +103,7 @@ angular.module('smartplayds')
 					 
 					if(resp.error==null){
 						$scope.myPres=resp.item;
-						$scope.myPresPreviewURL="https://viewer-test.appspot.com/Viewer.html?type=presentation&id="+presentationId;
+						$scope.myPresPreviewURL="https://viewer-test.appspot.com/Viewer.html?type=presentation&id="+presentationId+"&time="+new Date().getTime();
 						
 						
 						$scope.presentationInfo=resp.item.layout;
@@ -117,7 +117,7 @@ angular.module('smartplayds')
 							var content=doc.scripts[0].text;
 							var pJsonStr=content.substring(content.indexOf("= ")+2,content.lastIndexOf("};")+1);
 							//console.log("***script tag content:: "+content);	
-							console.log("***script tag content: "+pJsonStr);
+							//console.log("***script tag content: "+pJsonStr);
 							var pJsonObj=JSON.parse(pJsonStr);
 							var placeholdersArr=pJsonObj.presentationData.placeholders;
 							var textItems=[];
@@ -212,11 +212,11 @@ angular.module('smartplayds')
 		}	
 		
 		//PUBLISH PRESENTATION
-		$scope.publishPresentation=function(presentationId){
+		$scope.publishPresentation=function(myPres){
 			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.presentation.publish({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
-					id:presentationId
+					id:myPres.id
 				  });
 				  
 				 request.execute(function(resp) {
@@ -224,7 +224,7 @@ angular.module('smartplayds')
 					if(resp.error!=null){
 						alert("Error occurred. Please try again! <br>"+JSON.stringify(resp.error,null,2));
 					}else{
-						alert(presentationId+" published successfully!");
+						alert("Presentation "+myPres.name+" published successfully!");
 					}
 					$scope.$apply();
 				 });
@@ -232,14 +232,14 @@ angular.module('smartplayds')
 		}
 		
 		//DELETE PRESENTATION
-		$scope.deletePresentation=function(presentationId){
+		$scope.deletePresentation=function(myPres){
 			if(!confirm("Are you sure you want to delete?")){
 				return;
 			}
 			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.presentation.delete({
 					//'username': 'sreenivasulu.kaluva@gmail.com'
-					id:presentationId
+					id:myPres.id
 				  });
 				  
 				 request.execute(function(resp) { 
@@ -253,7 +253,7 @@ angular.module('smartplayds')
 							alert("Presentation "+presentationId+" deleted successfully!");	
 							$scope.listPresentations();		
 						});*/
-						alert("Presentation "+presentationId+" deleted successfully!");	
+						alert("Presentation "+myPres.name+" deleted successfully!");	
 						$scope.showPresTabs=false;
 						$scope.listPresentations();		
 
@@ -334,7 +334,7 @@ angular.module('smartplayds')
 				var content=doc.scripts[0].text;
 				var pJsonStr=content.substring(content.indexOf("= ")+2,content.lastIndexOf("};")+1);
 				//console.log("***script tag content:: "+content);	
-				console.log("***script tag content: "+pJsonStr);
+				//console.log("***script tag content: "+pJsonStr);
 				var pJsonObj=JSON.parse(pJsonStr);
 				var placeholdersArr=pJsonObj.presentationData.placeholders;
 				
@@ -370,14 +370,14 @@ angular.module('smartplayds')
 			var _data={
 				//"name": pres.name,
 				//"publish": pres.publish,
-				"layout":JSON.stringify(pres.layout),
+				"layout":layout//pres.layout,
 				//"isTemplate":pres.isTemplate
 			}
 
 			var params={};
 
 			// if (_data) {
-        		params['data'] = JSON.parse(_data);
+        		params['data'] = _data;//JSON.parse(_data);
 		    // }
 		    // if (_id) {
 		        params['id'] = pres.id;
