@@ -14,6 +14,7 @@
 			<input type="text" data-ng-model="myPres.name" name="name" class="form-control" required/-->
 		</div>
 		
+		<!-- 
 		<label class="text"><u>List of Images</u></label>  
 		<div class="form-group" data-ng-repeat="img in myPres.imageItems" data-ng-show="myPres.imageItems">
 			<label class="text" for="{{img.phId}}">placeholder({{img.phId}}) image({{img.itemIndex+1}})</label>
@@ -23,25 +24,58 @@
 		</div>
 		<div class="form-group" data-ng-show="!myPres.imageItems">
 			No Images Found!
-		</div>
+		</div> -->
 
-		<!--
-		<label class="text"><u>List of Text Items</u></label>  
-		<div class="form-group" data-ng-repeat="txt in myPres.textItems" data-ng-show="myPres.textItems">
-			<label class="text" for="{{txt.txtItemId}}">placeholder({{txt.phId}}) text({{txt.txtItemId}})</label>
-			<input type="text" data-ng-model="txt.data" name="txtData" id="{{txt.txtItemId}}" style="width:50%" />
-			<span class="error" data-ng-show="myPresForm.txtData.$error.required">Required!</span>
-		</div>
-		<div class="form-group" data-ng-show="!myPres.textItems">
-			No Text Items Found!
-		</div>-->
-		
-		<!--div class="form-group">
-			<label for="layout">Presentation data</label>
-			<span class="label label-danger" data-ng-show="submitted && myPresForm.layout.$error.required">Required!</span>	
-			<textarea data-ng-model="myPres.layout" name="layout" class="form-control" required></textarea>
-		</div-->
-		
+		<!-- IMAGE ITEMS -->
+		<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th colspan="2" style="text-align:center">LIST OF IMAGE ITEMS</th>
+					</tr>	
+				</thead>
+			<tbody>
+
+			<tr data-ng-repeat="img in myPres.imageItems" data-ng-show="myPres.imageItems">
+				<th style="width:30%">placeholder({{img.phId}}) image({{img.itemIndex+1}})</th>
+				<td>
+					<input type="text" data-ng-model="img.data" name="imgData" id="{{img.phId}}_{{img.itemIndex}}" style="width:80%" />
+					<span class="error" data-ng-show="myPresForm.imgData.$error.required">Required!</span>
+					<span class="error" data-ng-show="myPresForm.imgData.$error.url">Not valid url!</span>
+				</td>
+			</tr>
+			<tr data-ng-show="!myPres.imageItems">
+				<td colspan="2" style="text-align:center">No Images Found</td>
+			</tr>
+			</tbody>
+			
+		</table>
+
+		<!-- TEX ITEMS -->
+
+		<table class="table table-bordered">
+				<thead>
+					<tr>
+			
+					<th colspan="2" style="text-align:center">LIST OF TEXT ITEMS</th>
+					</tr>	
+			
+				</thead>
+			<tbody>
+
+			<tr data-ng-repeat="txt in myPres.textItems" data-ng-show="myPres.textItems">
+				<th style="width:30%">placeholder({{txt.phId}}) text({{txt.txtSpanId}})</th>
+				<td>
+					<input type="text" data-ng-model="txt.data" name="txtData" id="{{txt.txtSpanId}}" style="width:80%" />
+					<span class="error" data-ng-show="myPresForm.txtData.$error.required">Required!</span>
+				</td>
+			</tr>
+			<tr data-ng-show="!myPres.textItems">
+				<td colspan="2" style="text-align:center">No Text Items Found</td>
+			</tr>
+			</tbody>
+			
+		</table>
+
 		<div class="form-group">
 			<label for="publishType">Publish To</label>
 			<input type="radio" value="0" data-ng-model="myPres.publish" name="publishType"/> Only Signed In Users
@@ -55,7 +89,5 @@
 		
 		<button class="btn btn-primary" data-ng-hide="fromTemplate || showNewPresForm"  data-ng-click="updatePresentation(myPres,myPresForm)">Save</button>
 		<button class="btn btn-primary" data-ng-show="fromTemplate || showNewPresForm" data-ng-click="createPresentation(myPres,myPresForm)">Create</button>
-		<button class="btn btn-primary" data-ng-click="txtation(myPres)">txtlish</button>
-		<button class="btntxt-primary" data-ng-click="deletePresentation(txtData)">Delete</button>
-txtData
-text/Text Itemsv>
+		<button class="btn btn-primary" data-ng-click="publishPresentation(myPres)">Publish</button>
+		<button class="btn btn-primary" data-ng-click="deletePresentation(myPres)">Delete</button>

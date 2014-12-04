@@ -1,0 +1,7 @@
+/*To solve iframe inside div rendering issue in chrome*/
+.frame {
+    border: medium none;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}

@@ -132,7 +132,7 @@ angular.module('smartplayds')
 							for(var i=0;i<placeholdersArr.length;i++){
 								var ph=placeholdersArr[i];
 								var items=ph.items;
-								textItems.push(ph.id,{});
+								// textItems.push(ph.id,{});
 								for(var j=0;j<items.length;j++){
 									var item=items[j];
 									if(item.type=="text"){
@@ -146,7 +146,7 @@ angular.module('smartplayds')
 														var myTexItem={};
 														myTexItem["phId"]=ph.id;
 														myTexItem["itemIndex"]=j;
-														myTexItem["txtItemId"]=currentSpan.id;
+														myTexItem["txtSpanId"]=currentSpan.id;
 														myTexItem["data"]=currentSpan.innerHTML;		
 														textItems.push(myTexItem);
 												}
@@ -220,8 +220,8 @@ angular.module('smartplayds')
 				  });
 				  
 				 request.execute(function(resp) {
-					$scope.resp="<pre>***PUBLISH "+presentationId+" RESPONSE***<br>"+JSON.stringify(resp.error!=null?resp.error:resp.result,null,2)+"</pre>";
 					if(resp.error!=null){
+						$scope.resp="<pre>***PUBLISH "+myPres.name+" RESPONSE***<br>"+JSON.stringify(resp.error,null,2)+"</pre>";		
 						alert("Error occurred. Please try again! <br>"+JSON.stringify(resp.error,null,2));
 					}else{
 						alert("Presentation "+myPres.name+" published successfully!");
@@ -338,6 +338,7 @@ angular.module('smartplayds')
 				var pJsonObj=JSON.parse(pJsonStr);
 				var placeholdersArr=pJsonObj.presentationData.placeholders;
 				
+				//update image items
 				for(var i=0;i<pres.imageItems.length;i++){
 					var formImageItem=pres.imageItems[i];
 					
@@ -357,6 +358,28 @@ angular.module('smartplayds')
 						}
 					}
 				}
+
+				//update text items...
+				var parser= new DOMParser();
+							
+				for(var i=0;i<pres.textItems.length;i++){
+					var formTextItem=pres.textItems[i];
+					
+					for(var j=0;j<placeholdersArr.length;j++){
+						var ph=placeholdersArr[j];
+						if(ph.id==formTextItem.phId){
+							var phTextItem=ph.items[formTextItem.itemIndex];
+							var phTextItemDoc=parser.parseFromString(phTextItem.objectData,"text/html");
+						
+							var spanItem=phTextItemDoc.getElementById(formTextItem.txtSpanId);
+							spanItem.innerHTML=formTextItem.data;
+
+							phTextItem.objectData=phTextItemDoc.documentElement.innerHTML;//update with modified content
+
+							break;	
+						}
+					}
+				}
 				
 				console.log(pJsonObj);
 				
@@ -364,14 +387,14 @@ angular.module('smartplayds')
 				doc.scripts[0].text=content;
 			}
 			
-			var layout="<!DOCTYPE HTML><html>"+doc.documentElement.innerHTML+"</html>";
+			var final_layout="<!DOCTYPE HTML><html>"+doc.documentElement.innerHTML+"</html>";
 			
 			
 			var _data={
 				//"name": pres.name,
-				//"publish": pres.publish,
-				"layout":layout//pres.layout,
-				//"isTemplate":pres.isTemplate
+				"publish": pres.publish,
+				"layout":final_layout,
+				"isTemplate":pres.isTemplate
 			}
 
 			var params={};
@@ -386,8 +409,6 @@ angular.module('smartplayds')
 		        parameters['fields'] = _fields;
 		    }*/
 			
-//http://commondatastorage.googleapis.com/risemedialibrary-6c41247e-04bc-4b41-81de-7a065e4d970c/icon-event-off.png
-//http://commondatastorage.googleapis.com/risemedialibrary-6c41247e-04bc-4b41-81de-7a065e4d970c/icon-service-off.png
 
 			gapi.client.load(API_NAME, API_VER, function() {
 			  var request = gapi.client.core.presentation.patch(params);
